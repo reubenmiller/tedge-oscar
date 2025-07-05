@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -75,7 +76,7 @@ var listInstancesCmd = &cobra.Command{
 		}
 		// Prepare all rows first
 		rows := [][]string{}
-		colNames := []string{"NAME", "PATH", "TOPICS", "IMAGE"}
+		colNames := []string{"NAME", "PATH", "TOPICS", "IMAGE", "IMAGE_VERSION"}
 		for _, file := range files {
 			if file.IsDir() || !strings.HasSuffix(file.Name(), ".toml") {
 				continue
@@ -91,6 +92,7 @@ var listInstancesCmd = &cobra.Command{
 			}
 			topics := ""
 			image := "<invalid>"
+			imageVersion := "<unknown>"
 			if _, err := toml.DecodeFile(filepath.Join(deployDir, file.Name()), &data); err == nil && len(data.Stages) > 0 {
 				topics = strings.Join(data.InputTopics, ", ")
 				// If the image path starts with the expanded imageDir, replace with unexpanded
@@ -102,8 +104,37 @@ var listInstancesCmd = &cobra.Command{
 					}
 				}
 				image = imgPath
+				// Try to get image version from manifest.json
+				manifestPath := ""
+				if strings.HasPrefix(data.Stages[0].Filter, cfg.ImageDir) {
+					// e.g. /Users/you/.tedge/images/imagename/dist/main.mjs
+					imgDir := filepath.Dir(filepath.Dir(data.Stages[0].Filter))
+					manifestPath = filepath.Join(imgDir, "manifest.json")
+				}
+				if manifestPath != "" {
+					if f, err := os.Open(manifestPath); err == nil {
+						var manifest map[string]interface{}
+						if err := json.NewDecoder(f).Decode(&manifest); err == nil {
+							if ann, ok := manifest["annotations"].(map[string]interface{}); ok {
+								if v, ok := ann["org.opencontainers.image.version"].(string); ok {
+									imageVersion = v
+								}
+							}
+						}
+						f.Close()
+					}
+				}
 			}
-			rows = append(rows, []string{name, path, topics, image})
+			// Only show the image name (not the path)
+			imageName := "<invalid>"
+			if image != "<invalid>" {
+				// Try to extract the image directory name from the path
+				imgDir := filepath.Base(filepath.Dir(filepath.Dir(data.Stages[0].Filter)))
+				if imgDir != "." && imgDir != "/" && imgDir != "" {
+					imageName = imgDir
+				}
+			}
+			rows = append(rows, []string{name, path, topics, imageName, imageVersion})
 		}
 		if len(rows) == 0 {
 			fmt.Println("No flow instances are currently deployed.")
