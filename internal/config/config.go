@@ -1,11 +1,13 @@
 package config
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
 
 	"github.com/BurntSushi/toml"
+	"oras.land/oras-go/v2/registry/remote/credentials"
 )
 
 type RegistryCredential struct {
@@ -62,6 +64,29 @@ func LoadConfig(path string) (*Config, error) {
 }
 
 func (c *Config) FindCredential(registry string) *RegistryCredential {
+	// Prefer Docker credentials store if available
+	username, password, err := LoadDockerCredentials(registry)
+	fmt.Printf("Loaded from docker: username=%s, password=%s, registry=%s\n", username, password, registry)
+	if err == nil && username != "" && password != "" {
+		return &RegistryCredential{
+			Registry: registry,
+			Username: username,
+			Password: password,
+		}
+	}
+	// Then try ORAS credentials store
+	credStore, err := credentials.NewStore("", credentials.StoreOptions{})
+	if err == nil {
+		cred, err := credStore.Get(context.Background(), registry)
+		if err == nil && cred.Username != "" && cred.Password != "" {
+			return &RegistryCredential{
+				Registry: registry,
+				Username: cred.Username,
+				Password: cred.Password,
+			}
+		}
+	}
+	// Fallback to config file
 	for _, cred := range c.Registries {
 		if cred.Registry == registry {
 			return &cred
