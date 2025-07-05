@@ -236,9 +236,57 @@ var deployCmd = &cobra.Command{
 	},
 }
 
+var removeInstanceCmd = &cobra.Command{
+	Use:   "remove [instance_name]",
+	Short: "Remove a deployed flow instance",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		cfgPath := configPath
+		if cfgPath == "" {
+			cfgPath = config.DefaultConfigPath()
+		}
+		cfg, err := config.LoadConfig(cfgPath)
+		if err != nil {
+			return err
+		}
+		deployDir := cfg.DeployDir
+		if deployDir == "" {
+			deployDir = os.Getenv("DEPLOY_DIR")
+		}
+		if deployDir == "" {
+			deployDir = filepath.Join(filepath.Dir(cfg.ImageDir), "deployments")
+		}
+		instanceName := args[0]
+		// Find the matching file by instance name (basename without .toml)
+		var matchFile string
+		entries, err := os.ReadDir(deployDir)
+		if err != nil {
+			return fmt.Errorf("failed to read deploy dir: %w", err)
+		}
+		for _, entry := range entries {
+			if entry.IsDir() || !strings.HasSuffix(entry.Name(), ".toml") {
+				continue
+			}
+			if strings.TrimSuffix(entry.Name(), ".toml") == instanceName {
+				matchFile = filepath.Join(deployDir, entry.Name())
+				break
+			}
+		}
+		if matchFile == "" {
+			return fmt.Errorf("instance '%s' not found in %s", instanceName, deployDir)
+		}
+		if err := os.Remove(matchFile); err != nil {
+			return fmt.Errorf("failed to remove instance file: %w", err)
+		}
+		fmt.Printf("Instance %s removed (%s)\n", instanceName, matchFile)
+		return nil
+	},
+}
+
 func init() {
 	instancesCmd.AddCommand(listInstancesCmd)
 	instancesCmd.AddCommand(deployCmd)
+	instancesCmd.AddCommand(removeInstanceCmd)
 	deployCmd.Flags().Int("tick", 0, "Tick interval in seconds (optional)")
 	flowsCmd.AddCommand(instancesCmd)
 }
