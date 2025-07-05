@@ -20,8 +20,9 @@ var instancesCmd = &cobra.Command{
 }
 
 var listInstancesCmd = &cobra.Command{
-	Use:   "list",
-	Short: "List deployed flow instances",
+	Use:          "list",
+	Short:        "List deployed flow instances",
+	SilenceUsage: true, // Do not show help on runtime errors
 	Run: func(cmd *cobra.Command, args []string) {
 		cfgPath := configPath
 		if cfgPath == "" {
@@ -104,6 +105,10 @@ var listInstancesCmd = &cobra.Command{
 			}
 			rows = append(rows, []string{name, path, topics, image})
 		}
+		if len(rows) == 0 {
+			fmt.Println("No flow instances are currently deployed.")
+			return
+		}
 		// Determine which columns fit in one row
 		maxWidth := 0
 		if w, _, err := terminalSize(); err == nil {
@@ -150,9 +155,10 @@ var listInstancesCmd = &cobra.Command{
 }
 
 var deployCmd = &cobra.Command{
-	Use:   "deploy [instance_name] [image] [topics...]",
-	Short: "Deploy a flow instance",
-	Args:  cobra.MinimumNArgs(3),
+	Use:          "deploy [instance_name] [image] [topics...]",
+	Short:        "Deploy a flow instance",
+	Args:         cobra.MinimumNArgs(3),
+	SilenceUsage: true, // Do not show help on runtime errors
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cfgPath := configPath
 		if cfgPath == "" {
@@ -237,9 +243,10 @@ var deployCmd = &cobra.Command{
 }
 
 var removeInstanceCmd = &cobra.Command{
-	Use:   "remove [instance_name]",
-	Short: "Remove a deployed flow instance",
-	Args:  cobra.ExactArgs(1),
+	Use:          "remove [instance_name]",
+	Short:        "Remove a deployed flow instance",
+	Args:         cobra.ExactArgs(1),
+	SilenceUsage: true, // Do not show help on runtime errors
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cfgPath := configPath
 		if cfgPath == "" {
