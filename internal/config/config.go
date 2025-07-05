@@ -15,11 +15,11 @@ type RegistryCredential struct {
 }
 
 type Config struct {
-	ImageDir              string               `toml:"image_dir" json:"image_dir" yaml:"image_dir"`
-	DeployDir             string               `toml:"deploy_dir" json:"deploy_dir" yaml:"deploy_dir"`
-	Registries            []RegistryCredential `toml:"registries" json:"registries" yaml:"registries"`
-	UnexpandedImageDir    string               `toml:"-" json:"-" yaml:"-"`
-	UnexpandedDeployDir   string               `toml:"-" json:"-" yaml:"-"`
+	ImageDir            string               `toml:"image_dir" json:"image_dir" yaml:"image_dir"`
+	DeployDir           string               `toml:"deploy_dir" json:"deploy_dir" yaml:"deploy_dir"`
+	Registries          []RegistryCredential `toml:"registries" json:"registries" yaml:"registries"`
+	UnexpandedImageDir  string               `toml:"-" json:"-" yaml:"-"`
+	UnexpandedDeployDir string               `toml:"-" json:"-" yaml:"-"`
 }
 
 func DefaultConfigPath() string {
