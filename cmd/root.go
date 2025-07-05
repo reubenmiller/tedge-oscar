@@ -7,6 +7,7 @@ import (
 )
 
 var configPath string
+var logLevel string
 
 var rootCmd = &cobra.Command{
 	Use:   "tedge-oscar",
@@ -31,4 +32,8 @@ func Execute() {
 func init() {
 	rootCmd.AddCommand(flowsCmd)
 	rootCmd.PersistentFlags().StringVarP(&configPath, "config", "c", "", "Path to config file (overrides default)")
+	rootCmd.PersistentFlags().StringVar(&logLevel, "log-level", "info", "Set the log level (debug, info, warn, error)")
+	_ = rootCmd.RegisterFlagCompletionFunc("log-level", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		return []string{"debug", "info", "warn", "error"}, cobra.ShellCompDirectiveNoFileComp
+	})
 }

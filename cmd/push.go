@@ -14,6 +14,8 @@ var pushCmd = &cobra.Command{
 	Example: `tedge-oscar flows images push ghcr.io/reubenmiller/connectivity-counter:1.0 --file flow.json --file README.md`,
 	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		// Set debugHTTP based on logLevel
+		imagepush.SetDebugHTTP(logLevel)
 		cfgPath := configPath
 		if cfgPath == "" {
 			cfgPath = config.DefaultConfigPath()

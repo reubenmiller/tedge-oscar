@@ -22,6 +22,14 @@ import (
 	"github.com/thin-edge/tedge-oscar/internal/config"
 )
 
+// debugHTTP controls whether HTTP debug output is shown
+var debugHTTP bool
+
+// SetDebugHTTP sets the debugHTTP variable based on log level
+func SetDebugHTTP(level string) {
+	debugHTTP = (level == "debug")
+}
+
 func PushImage(cfg *config.Config, imageRef string, ociType string, files []string) error {
 	var err error
 	repoRef, ref := imageRef, ""
@@ -183,14 +191,16 @@ func (rt roundTripperWithBasicAuth) RoundTrip(req *http.Request) (*http.Response
 		req.Header.Set("Authorization", header)
 	}
 	// Debug: print HTTP request details including Authorization header
-	fmt.Println("--- HTTP Request ---")
-	fmt.Printf("%s %s\n", req.Method, req.URL.String())
-	for k, v := range req.Header {
-		for _, vv := range v {
-			fmt.Printf("%s: %s\n", k, vv)
+	if debugHTTP {
+		fmt.Println("--- HTTP Request ---")
+		fmt.Printf("%s %s\n", req.Method, req.URL.String())
+		for k, v := range req.Header {
+			for _, vv := range v {
+				fmt.Printf("%s: %s\n", k, vv)
+			}
 		}
+		fmt.Println("-------------------")
 	}
-	fmt.Println("-------------------")
 	return rt.base.RoundTrip(req)
 }
 
@@ -202,13 +212,15 @@ type roundTripperWithBearerToken struct {
 func (rt roundTripperWithBearerToken) RoundTrip(req *http.Request) (*http.Response, error) {
 	req.Header.Set("Authorization", "Bearer "+rt.token)
 	// Debug: print HTTP request details including Bearer token
-	fmt.Println("--- HTTP Request ---")
-	fmt.Printf("%s %s\n", req.Method, req.URL.String())
-	for k, v := range req.Header {
-		for _, vv := range v {
-			fmt.Printf("%s: %s\n", k, vv)
+	if debugHTTP {
+		fmt.Println("--- HTTP Request ---")
+		fmt.Printf("%s %s\n", req.Method, req.URL.String())
+		for k, v := range req.Header {
+			for _, vv := range v {
+				fmt.Printf("%s: %s\n", k, vv)
+			}
 		}
+		fmt.Println("-------------------")
 	}
-	fmt.Println("-------------------")
 	return rt.base.RoundTrip(req)
 }
