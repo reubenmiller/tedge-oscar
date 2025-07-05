@@ -159,6 +159,39 @@ var deployCmd = &cobra.Command{
 	Short:        "Deploy a flow instance",
 	Args:         cobra.MinimumNArgs(3),
 	SilenceUsage: true, // Do not show help on runtime errors
+	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		// Only complete for the image argument (second arg, index 1)
+		if len(args) != 1 {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+		cfgPath := configPath
+		if cfgPath == "" {
+			cfgPath = config.DefaultConfigPath()
+		}
+		cfg, err := config.LoadConfig(cfgPath)
+		if err != nil {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+		imageDir := cfg.ImageDir
+		if imageDir == "" {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+		entries, err := os.ReadDir(imageDir)
+		if err != nil {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+		var completions []string
+		for _, entry := range entries {
+			if !entry.IsDir() {
+				continue
+			}
+			name := entry.Name()
+			if strings.HasPrefix(name, toComplete) {
+				completions = append(completions, name)
+			}
+		}
+		return completions, cobra.ShellCompDirectiveNoFileComp
+	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cfgPath := configPath
 		if cfgPath == "" {
