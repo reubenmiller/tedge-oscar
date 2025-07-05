@@ -66,7 +66,6 @@ func LoadConfig(path string) (*Config, error) {
 func (c *Config) FindCredential(registry string) *RegistryCredential {
 	// Prefer Docker credentials store if available
 	username, password, err := LoadDockerCredentials(registry)
-	fmt.Printf("Loaded from docker: username=%s, password=%s, registry=%s\n", username, password, registry)
 	if err == nil && username != "" && password != "" {
 		return &RegistryCredential{
 			Registry: registry,
