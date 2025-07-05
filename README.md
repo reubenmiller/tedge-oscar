@@ -10,6 +10,40 @@ A Go CLI tool to manage thin-edge.io flows, including pulling and pushing flow i
 - `tedge-oscar flows instances list` — List deployed flow instances
 - `tedge-oscar flows instances deploy` — Deploy a flow instance
 
+## Typical Workflow Example
+
+1. Publish (push) a flow image to a registry
+
+   ```sh
+   tedge-oscar flows images push ghcr.io/youruser/your-flow:1.0 \
+     --file flow.json --file README.md
+   ```
+
+2. Pull a flow image from a registry
+
+   ```sh
+   tedge-oscar flows images pull ghcr.io/youruser/your-flow:1.0
+   ```
+
+3. Deploy an instance using the pulled image
+
+   ```sh
+   tedge-oscar flows instances deploy myinstance ghcr.io/youruser/your-flow:1.0 \
+     --topics te/device/main///m/+
+   ```
+
+4. List deployed instances
+
+   ```sh
+   tedge-oscar flows instances list
+   ```
+
+5. Remove an instance
+
+   ```sh
+   tedge-oscar flows instances remove myinstance
+   ```
+
 ## Development
 
 - Built with [Cobra](https://github.com/spf13/cobra) for CLI structure
