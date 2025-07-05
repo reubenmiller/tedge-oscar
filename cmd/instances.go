@@ -247,6 +247,45 @@ var removeInstanceCmd = &cobra.Command{
 	Short:        "Remove a deployed flow instance",
 	Args:         cobra.ExactArgs(1),
 	SilenceUsage: true, // Do not show help on runtime errors
+	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		cfgPath := configPath
+		if cfgPath == "" {
+			cfgPath = config.DefaultConfigPath()
+		}
+		cfg, err := config.LoadConfig(cfgPath)
+		if err != nil {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+		deployDir := cfg.DeployDir
+		if deployDir == "" {
+			deployDir = os.Getenv("DEPLOY_DIR")
+		}
+		if deployDir == "" {
+			deployDir = filepath.Join(filepath.Dir(cfg.ImageDir), "deployments")
+		}
+		entries, err := os.ReadDir(deployDir)
+		if err != nil {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+		var completions []string
+		provided := make(map[string]struct{})
+		for _, arg := range args {
+			provided[arg] = struct{}{}
+		}
+		for _, entry := range entries {
+			if entry.IsDir() || !strings.HasSuffix(entry.Name(), ".toml") {
+				continue
+			}
+			name := strings.TrimSuffix(entry.Name(), ".toml")
+			if _, already := provided[name]; already {
+				continue
+			}
+			if strings.HasPrefix(name, toComplete) {
+				completions = append(completions, name)
+			}
+		}
+		return completions, cobra.ShellCompDirectiveNoFileComp
+	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cfgPath := configPath
 		if cfgPath == "" {
