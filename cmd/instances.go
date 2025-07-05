@@ -30,10 +30,10 @@ $ tedge-oscar flows instances remove myinstance
 }
 
 var listInstancesCmd = &cobra.Command{
-	Use:          "list",
-	Short:        "List deployed flow instances",
-	Aliases:      []string{"ps", "ls"},
-	Example:      `# List all deployed flow instances
+	Use:     "list",
+	Short:   "List deployed flow instances",
+	Aliases: []string{"ps", "ls"},
+	Example: `# List all deployed flow instances
 $ tedge-oscar flows instances list`,
 	SilenceUsage: true, // Do not show help on runtime errors
 	Run: func(cmd *cobra.Command, args []string) {
@@ -180,10 +180,10 @@ $ tedge-oscar flows instances list`,
 }
 
 var deployCmd = &cobra.Command{
-	Use:          "deploy [instance_name] [image]",
-	Short:        "Deploy a flow instance",
-	Aliases:      []string{"run"},
-	Example:      `# Deploy a new instance using a specific image and topic
+	Use:     "deploy [instance_name] [image]",
+	Short:   "Deploy a flow instance",
+	Aliases: []string{"run"},
+	Example: `# Deploy a new instance using a specific image and topic
 $ tedge-oscar flows instances deploy myinstance ghcr.io/reubenmiller/connectivity-counter:1.0 --topics te/device/main///m/+`,
 	Args:         cobra.ExactArgs(2),
 	SilenceUsage: true, // Do not show help on runtime errors
@@ -310,10 +310,10 @@ $ tedge-oscar flows instances deploy myinstance ghcr.io/reubenmiller/connectivit
 }
 
 var removeInstanceCmd = &cobra.Command{
-	Use:          "remove [instance_name]",
-	Short:        "Remove a deployed flow instance",
-	Aliases:      []string{"rm"},
-	Example:      `# Remove a deployed instance
+	Use:     "remove [instance_name]",
+	Short:   "Remove a deployed flow instance",
+	Aliases: []string{"rm"},
+	Example: `# Remove a deployed instance
 $ tedge-oscar flows instances remove myinstance`,
 	Args:         cobra.ExactArgs(1),
 	SilenceUsage: true, // Do not show help on runtime errors
