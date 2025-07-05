@@ -1,0 +1,14 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "shell",
+			"label": "Build tedge-oscar CLI",
+			"command": "go build -o tedge-oscar .",
+			"group": "build",
+			"problemMatcher": [
+				"$go"
+			]
+		}
+	]
+}
