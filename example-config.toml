@@ -1,8 +1,13 @@
 # Example tedge-oscar configuration (TOML format)
 
 # Directory where pulled OCI images will be stored
-image_dir = "./images"
+image_dir = "$HOME/images"
 
 # You can also use JSON or YAML formats if preferred.
 # For JSON, use: { "image_dir": "./images" }
 # For YAML, use: image_dir: ./images
+
+[[registries]]
+registry = "ghcr.io"
+username = ""
+password = ""
