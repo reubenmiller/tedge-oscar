@@ -54,7 +54,13 @@ func (c *Config) Expand() {
 func LoadConfig(path string) (*Config, error) {
 	var cfg Config
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		return nil, fmt.Errorf("config file not found: %s", path)
+		// Use sensible defaults if config file is missing
+		fmt.Fprintf(os.Stderr, "Warning: config file not found: %s. Using default settings.\n", path)
+		home, _ := os.UserHomeDir()
+		cfg.ImageDir = filepath.Join(home, ".tedge", "images")
+		cfg.DeployDir = filepath.Join(home, ".tedge", "deployments")
+		cfg.Expand()
+		return &cfg, nil
 	}
 	if _, err := toml.DecodeFile(path, &cfg); err != nil {
 		return nil, err
