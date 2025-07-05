@@ -3,10 +3,10 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/reubenmiller/tedge-oscar/internal/config"
+	"github.com/reubenmiller/tedge-oscar/internal/imagepull"
+	"github.com/reubenmiller/tedge-oscar/internal/registryauth"
 	"github.com/spf13/cobra"
-	"github.com/thin-edge/tedge-oscar/internal/config"
-	"github.com/thin-edge/tedge-oscar/internal/imagepull"
-	"github.com/thin-edge/tedge-oscar/internal/registryauth"
 )
 
 var pullCmd = &cobra.Command{

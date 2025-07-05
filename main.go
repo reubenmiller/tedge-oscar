@@ -1,6 +1,6 @@
 package main
 
-import "github.com/thin-edge/tedge-oscar/cmd"
+import "github.com/reubenmiller/tedge-oscar/cmd"
 
 func main() {
 	cmd.Execute()

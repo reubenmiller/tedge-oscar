@@ -13,8 +13,8 @@ import (
 	"oras.land/oras-go/v2/content/file"
 	"oras.land/oras-go/v2/registry/remote"
 
-	"github.com/thin-edge/tedge-oscar/internal/config"
-	"github.com/thin-edge/tedge-oscar/internal/registryauth"
+	"github.com/reubenmiller/tedge-oscar/internal/config"
+	"github.com/reubenmiller/tedge-oscar/internal/registryauth"
 )
 
 func PullImage(cfg *config.Config, imageRef string) error {

@@ -9,8 +9,8 @@ import (
 	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/cobra"
 
-	"github.com/thin-edge/tedge-oscar/internal/config"
-	"github.com/thin-edge/tedge-oscar/internal/util"
+	"github.com/reubenmiller/tedge-oscar/internal/config"
+	"github.com/reubenmiller/tedge-oscar/internal/util"
 )
 
 var imagesCmd = &cobra.Command{

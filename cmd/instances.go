@@ -9,10 +9,10 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/olekukonko/tablewriter"
+	"github.com/reubenmiller/tedge-oscar/internal/config"
+	"github.com/reubenmiller/tedge-oscar/internal/imagepull"
+	"github.com/reubenmiller/tedge-oscar/internal/util"
 	"github.com/spf13/cobra"
-	"github.com/thin-edge/tedge-oscar/internal/config"
-	"github.com/thin-edge/tedge-oscar/internal/imagepull"
-	"github.com/thin-edge/tedge-oscar/internal/util"
 	"golang.org/x/term"
 )
 
