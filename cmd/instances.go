@@ -23,6 +23,7 @@ var instancesCmd = &cobra.Command{
 var listInstancesCmd = &cobra.Command{
 	Use:          "list",
 	Short:        "List deployed flow instances",
+	Aliases:      []string{"ps", "ls"},
 	SilenceUsage: true, // Do not show help on runtime errors
 	Run: func(cmd *cobra.Command, args []string) {
 		cfgPath := configPath
@@ -170,6 +171,7 @@ var listInstancesCmd = &cobra.Command{
 var deployCmd = &cobra.Command{
 	Use:          "deploy [instance_name] [image]",
 	Short:        "Deploy a flow instance",
+	Aliases:      []string{"run"},
 	Args:         cobra.ExactArgs(2),
 	SilenceUsage: true, // Do not show help on runtime errors
 	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
@@ -297,6 +299,7 @@ var deployCmd = &cobra.Command{
 var removeInstanceCmd = &cobra.Command{
 	Use:          "remove [instance_name]",
 	Short:        "Remove a deployed flow instance",
+	Aliases:      []string{"rm"},
 	Args:         cobra.ExactArgs(1),
 	SilenceUsage: true, // Do not show help on runtime errors
 	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {

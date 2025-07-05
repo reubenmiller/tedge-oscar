@@ -13,13 +13,15 @@ import (
 )
 
 var imagesCmd = &cobra.Command{
-	Use:   "images",
-	Short: "Manage flow images as OCI artifacts",
+	Use:     "images",
+	Short:   "Manage flow images as OCI artifacts",
+	Aliases: []string{"image"},
 }
 
 var listImagesCmd = &cobra.Command{
-	Use:   "list",
-	Short: "List pulled images in the image_dir",
+	Use:     "list",
+	Short:   "List pulled images in the image_dir",
+	Aliases: []string{"ls"},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cfgPath := configPath
 		if cfgPath == "" {
@@ -118,7 +120,5 @@ var listImagesCmd = &cobra.Command{
 }
 
 func init() {
-	imagesCmd.AddCommand(pullCmd)
-	imagesCmd.AddCommand(pushCmd)
 	imagesCmd.AddCommand(listImagesCmd)
 }

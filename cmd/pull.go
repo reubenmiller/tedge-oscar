@@ -29,3 +29,7 @@ var pullCmd = &cobra.Command{
 		return nil
 	},
 }
+
+func init() {
+	imagesCmd.AddCommand(pullCmd)
+}

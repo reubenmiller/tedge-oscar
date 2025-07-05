@@ -14,3 +14,7 @@ var pushCmd = &cobra.Command{
 		// TODO: Implement oras push logic
 	},
 }
+
+func init() {
+	imagesCmd.AddCommand(pushCmd)
+}
