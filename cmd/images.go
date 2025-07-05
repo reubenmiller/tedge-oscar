@@ -41,6 +41,12 @@ var listImagesCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+
+		outputFormat, err := cmd.Flags().GetString("output")
+		if err != nil {
+			return err
+		}
+
 		imageDir := cfg.ImageDir
 		unexpandedImageDir := cfg.UnexpandedImageDir
 		if imageDir == "" {
@@ -80,11 +86,24 @@ var listImagesCmd = &cobra.Command{
 			rows = append(rows, []string{entry.Name(), version, digest})
 		}
 		if len(rows) == 0 {
-			fmt.Fprintf(os.Stderr, "No images found in image_dir (%s).\n", unexpandedImageDir)
+			fmt.Fprintf(cmd.ErrOrStderr(), "No images found in image_dir (%s).\n", unexpandedImageDir)
 			return nil
 		}
-		// Dynamically fit columns to terminal width
 		colNames := []string{"IMAGE", "VERSION", "DIGEST"}
+		if outputFormat == "jsonl" {
+			for _, row := range rows {
+				obj := map[string]string{}
+				for i, col := range colNames {
+					obj[col] = row[i]
+				}
+				enc := json.NewEncoder(cmd.OutOrStdout())
+				enc.SetEscapeHTML(false)
+				if err := enc.Encode(obj); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
 		maxWidth := 0
 		if w, _, err := terminalSize(); err == nil {
 			maxWidth = w
@@ -106,7 +125,6 @@ var listImagesCmd = &cobra.Command{
 		for _, w := range colWidths {
 			total += w
 		}
-		// Remove columns from right until fits
 		keep := len(colNames)
 		for total > maxWidth && keep > 1 {
 			keep--
@@ -130,5 +148,9 @@ var listImagesCmd = &cobra.Command{
 }
 
 func init() {
+	listImagesCmd.Flags().StringP("output", "o", "table", "Output format: table|jsonl")
+	_ = listImagesCmd.RegisterFlagCompletionFunc("output", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		return []string{"table", "jsonl"}, cobra.ShellCompDirectiveNoFileComp
+	})
 	imagesCmd.AddCommand(listImagesCmd)
 }

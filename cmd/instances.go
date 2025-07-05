@@ -36,15 +36,19 @@ var listInstancesCmd = &cobra.Command{
 	Example: `# List all deployed flow instances
 $ tedge-oscar flows instances list`,
 	SilenceUsage: true, // Do not show help on runtime errors
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
+		outputFormat, err := cmd.Flags().GetString("output")
+		if err != nil {
+			return err
+		}
+
 		cfgPath := configPath
 		if cfgPath == "" {
 			cfgPath = config.DefaultConfigPath()
 		}
 		cfg, err := config.LoadConfig(cfgPath)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Failed to load config: %v\n", err)
-			return
+			return fmt.Errorf("Failed to load config: %w", err)
 		}
 		deployDir := cfg.DeployDir
 		if deployDir == "" {
@@ -55,8 +59,7 @@ $ tedge-oscar flows instances list`,
 		}
 		files, err := os.ReadDir(deployDir)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Failed to read deploy dir: %v\n", err)
-			return
+			return fmt.Errorf("Failed to read deploy dir: %w", err)
 		}
 		// Use the unexpanded deployDir from config for display
 		unexpandedDeployDir := cfg.UnexpandedDeployDir
@@ -132,7 +135,19 @@ $ tedge-oscar flows instances list`,
 		}
 		if len(rows) == 0 {
 			fmt.Fprintln(cmd.ErrOrStderr(), "No flow instances are currently deployed.")
-			return
+			return nil
+		}
+		if outputFormat == "jsonl" {
+			for _, row := range rows {
+				obj := map[string]string{}
+				for i, col := range colNames {
+					obj[col] = row[i]
+				}
+				enc := json.NewEncoder(cmd.OutOrStdout())
+				enc.SetEscapeHTML(false)
+				_ = enc.Encode(obj)
+			}
+			return nil
 		}
 		// Determine which columns fit in one row
 		maxWidth := 0
@@ -176,6 +191,7 @@ $ tedge-oscar flows instances list`,
 		table.Header(colHeaders...)
 		table.Bulk(filteredRows)
 		table.Render()
+		return nil
 	},
 }
 
@@ -403,6 +419,12 @@ func init() {
 	instancesCmd.AddCommand(listInstancesCmd)
 	instancesCmd.AddCommand(deployCmd)
 	instancesCmd.AddCommand(removeInstanceCmd)
+
+	listInstancesCmd.Flags().StringP("output", "o", "table", "Output format: table|jsonl")
+	_ = listInstancesCmd.RegisterFlagCompletionFunc("output", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		return []string{"table", "jsonl"}, cobra.ShellCompDirectiveNoFileComp
+	})
+
 	deployCmd.Flags().Int("tick", 0, "Tick interval in seconds (optional)")
 	deployCmd.Flags().StringArray("topics", nil, "Input topics (repeatable, required)")
 	deployCmd.MarkFlagRequired("topics")
