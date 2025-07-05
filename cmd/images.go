@@ -117,13 +117,13 @@ var listImagesCmd = &cobra.Command{
 		for _, row := range rows {
 			filteredRows = append(filteredRows, row[:keep])
 		}
-		table := tablewriter.NewWriter(os.Stdout)
-		table.SetHeader(filteredColNames)
-		table.SetRowLine(true)
-		table.SetAutoWrapText(false)
-		for _, row := range filteredRows {
-			table.Append(row)
+		colHeaders := make([]any, len(filteredColNames))
+		for i, v := range filteredColNames {
+			colHeaders[i] = v
 		}
+		table := tablewriter.NewTable(os.Stdout)
+		table.Header(colHeaders...)
+		table.Bulk(filteredRows)
 		table.Render()
 		return nil
 	},
