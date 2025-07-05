@@ -28,7 +28,7 @@ var pushCmd = &cobra.Command{
 		imageRef := args[0]
 		ociType, _ := cmd.Flags().GetString("type")
 		if ociType == "" {
-			ociType = "application/vnd.tedge.flow"
+			ociType = "application/vnd.tedge.flow.v1"
 		}
 		files, _ := cmd.Flags().GetStringArray("file")
 		if len(files) == 0 {
@@ -43,7 +43,7 @@ var pushCmd = &cobra.Command{
 }
 
 func init() {
-	pushCmd.Flags().String("type", "", "OCI artifact type (default: application/vnd.tedge.flow)")
+	pushCmd.Flags().String("type", "", "OCI artifact type (default: application/vnd.tedge.flow.v1)")
 	pushCmd.Flags().StringArray("file", nil, "File(s) to include in the artifact (repeatable)")
 	imagesCmd.AddCommand(pushCmd)
 }
