@@ -19,7 +19,8 @@ import (
 	"github.com/reubenmiller/tedge-oscar/internal/registryauth"
 )
 
-func PushImage(cfg *config.Config, imageRef string, ociType string, files []string) error {
+// PushImage pushes files as an OCI artifact, preserving their paths relative to rootDir.
+func PushImage(cfg *config.Config, imageRef string, ociType string, files []string, rootDir string) error {
 	var err error
 	repoRef, ref := imageRef, ""
 	if i := strings.LastIndex(imageRef, ":"); i > strings.LastIndex(imageRef, "/") {
@@ -39,6 +40,11 @@ func PushImage(cfg *config.Config, imageRef string, ociType string, files []stri
 		if err != nil {
 			return fmt.Errorf("failed to read file %s: %w", f, err)
 		}
+		relPath, err := filepath.Rel(rootDir, f)
+		if err != nil {
+			return fmt.Errorf("failed to determine relative path for %s: %w", f, err)
+		}
+		relPath = filepath.ToSlash(relPath) // OCI prefers forward slashes
 		mediaType := "application/octet-stream"
 		var contentReader *bytes.Reader
 		if strings.HasPrefix(repoRef, "ghcr.io/") {
@@ -66,7 +72,7 @@ func PushImage(cfg *config.Config, imageRef string, ociType string, files []stri
 			MediaType:   mediaType,
 			Digest:      digest.FromBytes(data),
 			Size:        int64(len(data)),
-			Annotations: map[string]string{"org.opencontainers.image.title": filepath.Base(f)},
+			Annotations: map[string]string{"org.opencontainers.image.title": relPath},
 		}
 		if err := memStore.Push(context.Background(), d, contentReader); err != nil {
 			return fmt.Errorf("failed to add file %s to store: %w", f, err)

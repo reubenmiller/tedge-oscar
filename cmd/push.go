@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/reubenmiller/tedge-oscar/internal/config"
 	"github.com/reubenmiller/tedge-oscar/internal/imagepush"
@@ -34,10 +35,17 @@ var pushCmd = &cobra.Command{
 		if len(files) == 0 {
 			return fmt.Errorf("at least one --file must be specified to include in the artifact")
 		}
-		if err := imagepush.PushImage(cfg, imageRef, ociType, files); err != nil {
+		rootDir, _ := cmd.Flags().GetString("root")
+		if rootDir == "" {
+			rootDir, err = os.Getwd()
+			if err != nil {
+				return fmt.Errorf("failed to get current working directory: %w", err)
+			}
+		}
+		if err := imagepush.PushImage(cfg, imageRef, ociType, files, rootDir); err != nil {
 			return err
 		}
-		fmt.Fprintf(cmd.ErrOrStderr(), "Image %s pushed to registry as type %s with files: %v\n", imageRef, ociType, files)
+		fmt.Fprintf(cmd.ErrOrStderr(), "Image %s pushed to registry as type %s with files: %v (root: %s)\n", imageRef, ociType, files, rootDir)
 		return nil
 	},
 }
@@ -45,5 +53,6 @@ var pushCmd = &cobra.Command{
 func init() {
 	pushCmd.Flags().String("type", "", "OCI artifact type (default: application/vnd.tedge.flow.v1)")
 	pushCmd.Flags().StringArray("file", nil, "File(s) to include in the artifact (repeatable)")
+	pushCmd.Flags().String("root", "", "Root directory for path preservation inside the artifact (default: current working directory)")
 	imagesCmd.AddCommand(pushCmd)
 }
