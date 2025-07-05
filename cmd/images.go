@@ -89,7 +89,7 @@ var listImagesCmd = &cobra.Command{
 			fmt.Fprintf(cmd.ErrOrStderr(), "No images found in image_dir (%s).\n", unexpandedImageDir)
 			return nil
 		}
-		colNames := []string{"IMAGE", "VERSION", "DIGEST"}
+		colNames := []string{"image", "version", "digest"}
 		if outputFormat == "jsonl" {
 			for _, row := range rows {
 				obj := map[string]string{}

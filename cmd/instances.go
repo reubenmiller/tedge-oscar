@@ -73,7 +73,7 @@ $ tedge-oscar flows instances list`,
 		}
 		// Prepare all rows first
 		rows := [][]string{}
-		colNames := []string{"NAME", "PATH", "TOPICS", "IMAGE", "IMAGE_VERSION"}
+		colNames := []string{"name", "path", "topics", "image", "imageVersion"}
 		for _, file := range files {
 			if file.IsDir() || !strings.HasSuffix(file.Name(), ".toml") {
 				continue
