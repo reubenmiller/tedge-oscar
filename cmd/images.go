@@ -10,6 +10,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/thin-edge/tedge-oscar/internal/config"
+	"github.com/thin-edge/tedge-oscar/internal/util"
 )
 
 var imagesCmd = &cobra.Command{
@@ -148,7 +149,11 @@ var listImagesCmd = &cobra.Command{
 }
 
 func init() {
-	listImagesCmd.Flags().StringP("output", "o", "table", "Output format: table|jsonl")
+	defaultOutput := "jsonl"
+	if util.Isatty(os.Stdout.Fd()) {
+		defaultOutput = "table"
+	}
+	listImagesCmd.Flags().StringP("output", "o", defaultOutput, "Output format: table|jsonl")
 	_ = listImagesCmd.RegisterFlagCompletionFunc("output", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return []string{"table", "jsonl"}, cobra.ShellCompDirectiveNoFileComp
 	})

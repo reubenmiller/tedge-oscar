@@ -12,6 +12,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/thin-edge/tedge-oscar/internal/config"
 	"github.com/thin-edge/tedge-oscar/internal/imagepull"
+	"github.com/thin-edge/tedge-oscar/internal/util"
 	"golang.org/x/term"
 )
 
@@ -48,7 +49,7 @@ $ tedge-oscar flows instances list`,
 		}
 		cfg, err := config.LoadConfig(cfgPath)
 		if err != nil {
-			return fmt.Errorf("Failed to load config: %w", err)
+			return fmt.Errorf("failed to load config: %w", err)
 		}
 		deployDir := cfg.DeployDir
 		if deployDir == "" {
@@ -59,7 +60,7 @@ $ tedge-oscar flows instances list`,
 		}
 		files, err := os.ReadDir(deployDir)
 		if err != nil {
-			return fmt.Errorf("Failed to read deploy dir: %w", err)
+			return fmt.Errorf("failed to read deploy dir: %w", err)
 		}
 		// Use the unexpanded deployDir from config for display
 		unexpandedDeployDir := cfg.UnexpandedDeployDir
@@ -416,14 +417,17 @@ $ tedge-oscar flows instances remove myinstance`,
 }
 
 func init() {
-	instancesCmd.AddCommand(listInstancesCmd)
-	instancesCmd.AddCommand(deployCmd)
-	instancesCmd.AddCommand(removeInstanceCmd)
-
-	listInstancesCmd.Flags().StringP("output", "o", "table", "Output format: table|jsonl")
+	defaultOutput := "jsonl"
+	if util.Isatty(os.Stdout.Fd()) {
+		defaultOutput = "table"
+	}
+	listInstancesCmd.Flags().StringP("output", "o", defaultOutput, "Output format: table|jsonl")
 	_ = listInstancesCmd.RegisterFlagCompletionFunc("output", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return []string{"table", "jsonl"}, cobra.ShellCompDirectiveNoFileComp
 	})
+	instancesCmd.AddCommand(listInstancesCmd)
+	instancesCmd.AddCommand(deployCmd)
+	instancesCmd.AddCommand(removeInstanceCmd)
 
 	deployCmd.Flags().Int("tick", 0, "Tick interval in seconds (optional)")
 	deployCmd.Flags().StringArray("topics", nil, "Input topics (repeatable, required)")
