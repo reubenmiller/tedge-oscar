@@ -94,7 +94,9 @@ func GetAuthenticatedClient(cfg *config.Config, repoRef, scope string) (*http.Cl
 			resp, err := http.DefaultClient.Do(req)
 			if err == nil && resp.StatusCode == 200 {
 				defer resp.Body.Close()
-				type tokenResp struct{ Token string `json:"token"` }
+				type tokenResp struct {
+					Token string `json:"token"`
+				}
 				var tr tokenResp
 				if err := json.NewDecoder(resp.Body).Decode(&tr); err == nil && tr.Token != "" {
 					token = tr.Token
