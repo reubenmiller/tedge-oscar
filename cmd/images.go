@@ -80,7 +80,7 @@ var listImagesCmd = &cobra.Command{
 			rows = append(rows, []string{entry.Name(), version, digest})
 		}
 		if len(rows) == 0 {
-			fmt.Printf("No images found in image_dir (%s).\n", unexpandedImageDir)
+			fmt.Fprintf(os.Stderr, "No images found in image_dir (%s).\n", unexpandedImageDir)
 			return nil
 		}
 		// Dynamically fit columns to terminal width
@@ -121,7 +121,7 @@ var listImagesCmd = &cobra.Command{
 		for i, v := range filteredColNames {
 			colHeaders[i] = v
 		}
-		table := tablewriter.NewTable(os.Stdout)
+		table := tablewriter.NewTable(cmd.OutOrStdout())
 		table.Header(colHeaders...)
 		table.Bulk(filteredRows)
 		table.Render()

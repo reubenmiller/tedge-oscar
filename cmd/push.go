@@ -37,7 +37,7 @@ var pushCmd = &cobra.Command{
 		if err := imagepush.PushImage(cfg, imageRef, ociType, files); err != nil {
 			return err
 		}
-		fmt.Printf("Image %s pushed to registry as type %s with files: %v\n", imageRef, ociType, files)
+		fmt.Fprintf(cmd.ErrOrStderr(), "Image %s pushed to registry as type %s with files: %v\n", imageRef, ociType, files)
 		return nil
 	},
 }

@@ -29,7 +29,7 @@ var pullCmd = &cobra.Command{
 		if err := imagepull.PullImage(cfg, imageRef); err != nil {
 			return err
 		}
-		fmt.Printf("Image %s pulled to %s\n", imageRef, cfg.ImageDir)
+		fmt.Fprintf(cmd.ErrOrStderr(), "Image %s pulled to %s\n", imageRef, cfg.ImageDir)
 		return nil
 	},
 }

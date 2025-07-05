@@ -131,7 +131,7 @@ $ tedge-oscar flows instances list`,
 			rows = append(rows, []string{name, path, topics, imageName, imageVersion})
 		}
 		if len(rows) == 0 {
-			fmt.Println("No flow instances are currently deployed.")
+			fmt.Fprintln(cmd.ErrOrStderr(), "No flow instances are currently deployed.")
 			return
 		}
 		// Determine which columns fit in one row
@@ -172,7 +172,7 @@ $ tedge-oscar flows instances list`,
 		for i, v := range filteredColNames {
 			colHeaders[i] = v
 		}
-		table := tablewriter.NewTable(os.Stdout)
+		table := tablewriter.NewTable(cmd.OutOrStdout())
 		table.Header(colHeaders...)
 		table.Bulk(filteredRows)
 		table.Render()
@@ -264,14 +264,14 @@ $ tedge-oscar flows instances deploy myinstance ghcr.io/reubenmiller/connectivit
 		filterPath := filepath.Join(imagePath, "dist/main.mjs")
 
 		if _, err := os.Stat(imagePath); os.IsNotExist(err) {
-			fmt.Printf("Image %s not found locally. Pulling...\n", imageRef)
+			fmt.Fprintf(cmd.ErrOrStderr(), "Image %s not found locally. Pulling...\n", imageRef)
 			if err := imagepull.PullImage(cfg, imageRef); err != nil {
 				return fmt.Errorf("failed to pull image: %w", err)
 			}
 		}
 
 		if _, err := os.Stat(filterPath); os.IsNotExist(err) {
-			fmt.Printf("Image %s does not contain the expected entrypoint. path=%s\n", imageRef, filterPath)
+			fmt.Fprintf(cmd.ErrOrStderr(), "Image %s does not contain the expected entrypoint. path=%s\n", imageRef, filterPath)
 			return err
 		}
 
@@ -304,7 +304,7 @@ $ tedge-oscar flows instances deploy myinstance ghcr.io/reubenmiller/connectivit
 		if err := toml.NewEncoder(f).Encode(data); err != nil {
 			return err
 		}
-		fmt.Printf("Instance %s deployed at %s\n", instanceName, tomlPath)
+		fmt.Fprintf(cmd.ErrOrStderr(), "Instance %s deployed at %s\n", instanceName, tomlPath)
 		return nil
 	},
 }
@@ -394,7 +394,7 @@ $ tedge-oscar flows instances remove myinstance`,
 		if err := os.Remove(matchFile); err != nil {
 			return fmt.Errorf("failed to remove instance file: %w", err)
 		}
-		fmt.Printf("Instance %s removed (%s)\n", instanceName, matchFile)
+		fmt.Fprintf(cmd.ErrOrStderr(), "Instance %s removed (%s)\n", instanceName, matchFile)
 		return nil
 	},
 }
