@@ -47,32 +47,14 @@ var listInstancesCmd = &cobra.Command{
 			return
 		}
 		// Use the unexpanded deployDir from config for display
-		unexpandedDeployDir := config.DefaultConfigPath()
-		if configPath != "" {
-			// Try to read the unexpanded deployDir from the config file directly
-			var rawCfg map[string]interface{}
-			if _, err := toml.DecodeFile(configPath, &rawCfg); err == nil {
-				if v, ok := rawCfg["deploy_dir"]; ok {
-					if s, ok := v.(string); ok && s != "" {
-						unexpandedDeployDir = s
-					}
-				}
-			}
-		}
+		unexpandedDeployDir := cfg.UnexpandedDeployDir
 		if unexpandedDeployDir == "" {
 			unexpandedDeployDir = "$DEPLOY_DIR"
 		}
-		// Get the unexpanded image_dir from the config file for display
-		unexpandedImageDir := cfg.ImageDir
-		if configPath != "" {
-			var rawCfg map[string]interface{}
-			if _, err := toml.DecodeFile(configPath, &rawCfg); err == nil {
-				if v, ok := rawCfg["image_dir"]; ok {
-					if s, ok := v.(string); ok && s != "" {
-						unexpandedImageDir = s
-					}
-				}
-			}
+		// Get the unexpanded image_dir from the config for display
+		unexpandedImageDir := cfg.UnexpandedImageDir
+		if unexpandedImageDir == "" {
+			unexpandedImageDir = "$IMAGE_DIR"
 		}
 		// Prepare all rows first
 		rows := [][]string{}

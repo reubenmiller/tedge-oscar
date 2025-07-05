@@ -30,6 +30,7 @@ var listImagesCmd = &cobra.Command{
 			return err
 		}
 		imageDir := cfg.ImageDir
+		unexpandedImageDir := cfg.UnexpandedImageDir
 		if imageDir == "" {
 			return fmt.Errorf("image_dir not set in config")
 		}
@@ -67,7 +68,7 @@ var listImagesCmd = &cobra.Command{
 			rows = append(rows, []string{entry.Name(), version, digest})
 		}
 		if len(rows) == 0 {
-			fmt.Println("No images found in image_dir.")
+			fmt.Printf("No images found in image_dir (%s).\n", unexpandedImageDir)
 			return nil
 		}
 		// Dynamically fit columns to terminal width
