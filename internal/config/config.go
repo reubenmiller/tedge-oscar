@@ -16,6 +16,7 @@ type RegistryCredential struct {
 
 type Config struct {
 	ImageDir   string               `toml:"image_dir" json:"image_dir" yaml:"image_dir"`
+	DeployDir  string               `toml:"deploy_dir" json:"deploy_dir" yaml:"deploy_dir"`
 	Registries []RegistryCredential `toml:"registries" json:"registries" yaml:"registries"`
 }
 
@@ -33,6 +34,7 @@ func expandEnvVars(s string) string {
 
 func (c *Config) Expand() {
 	c.ImageDir = expandEnvVars(c.ImageDir)
+	c.DeployDir = expandEnvVars(c.DeployDir)
 	for i := range c.Registries {
 		c.Registries[i].Registry = expandEnvVars(c.Registries[i].Registry)
 		c.Registries[i].Username = expandEnvVars(c.Registries[i].Username)
