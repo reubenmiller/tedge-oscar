@@ -13,11 +13,11 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/opencontainers/go-digest"
+	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 	"oras.land/oras-go/v2"
 	"oras.land/oras-go/v2/content/memory"
 	"oras.land/oras-go/v2/registry/remote"
-	"github.com/opencontainers/go-digest"
-	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 
 	"github.com/thin-edge/tedge-oscar/internal/config"
 )
@@ -96,7 +96,7 @@ func PushImage(cfg *config.Config, imageRef string, ociType string, files []stri
 	}
 	packOpts := oras.PackManifestOptions{
 		ConfigDescriptor: &configDesc,
-		Layers:          descriptors,
+		Layers:           descriptors,
 	}
 	manifestDesc, err := oras.PackManifest(context.Background(), memStore, packVersion, artifactType, packOpts)
 	if err != nil {
@@ -137,7 +137,9 @@ func PushImage(cfg *config.Config, imageRef string, ociType string, files []stri
 				resp, err := http.DefaultClient.Do(req)
 				if err == nil && resp.StatusCode == 200 {
 					defer resp.Body.Close()
-					type tokenResp struct { Token string `json:"token"` }
+					type tokenResp struct {
+						Token string `json:"token"`
+					}
 					var tr tokenResp
 					if err := json.NewDecoder(resp.Body).Decode(&tr); err == nil && tr.Token != "" {
 						token = tr.Token
