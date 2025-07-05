@@ -9,5 +9,4 @@ var flowsCmd = &cobra.Command{
 
 func init() {
 	flowsCmd.AddCommand(imagesCmd)
-	flowsCmd.AddCommand(deployCmd)
 }
