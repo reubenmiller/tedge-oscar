@@ -4,11 +4,7 @@ import (
 	"bytes"
 	"compress/gzip"
 	"context"
-	"encoding/base64"
-	"encoding/json"
 	"fmt"
-	"net/http"
-	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -20,15 +16,8 @@ import (
 	"oras.land/oras-go/v2/registry/remote"
 
 	"github.com/thin-edge/tedge-oscar/internal/config"
+	"github.com/thin-edge/tedge-oscar/internal/registryauth"
 )
-
-// debugHTTP controls whether HTTP debug output is shown
-var debugHTTP bool
-
-// SetDebugHTTP sets the debugHTTP variable based on log level
-func SetDebugHTTP(level string) {
-	debugHTTP = (level == "debug")
-}
 
 func PushImage(cfg *config.Config, imageRef string, ociType string, files []string) error {
 	var err error
@@ -123,51 +112,18 @@ func PushImage(cfg *config.Config, imageRef string, ociType string, files []stri
 	if err != nil {
 		return fmt.Errorf("invalid repository: %w", err)
 	}
-	u, err := url.Parse("https://" + repoRef)
-	if err == nil {
-		reg := u.Host
-		var username, password string
-		if cred := cfg.FindCredential(reg); cred != nil {
-			username = cred.Username
-			password = cred.Password
-		} else {
-			username, password, _ = config.LoadDockerCredentials(reg)
-		}
-		token := ""
-		if reg == "ghcr.io" && username != "" && password != "" {
-			// Try to exchange credentials for a Bearer token using the GitHub token endpoint
-			ownerRepo := strings.TrimPrefix(repoRef, "ghcr.io/")
-			scope := "repository:" + ownerRepo + ":push,pull"
-			tokenURL := "https://ghcr.io/token?service=ghcr.io&scope=" + url.QueryEscape(scope)
-			req, err := http.NewRequest("GET", tokenURL, nil)
-			if err == nil {
-				req.SetBasicAuth(username, password)
-				resp, err := http.DefaultClient.Do(req)
-				if err == nil && resp.StatusCode == 200 {
-					defer resp.Body.Close()
-					type tokenResp struct {
-						Token string `json:"token"`
-					}
-					var tr tokenResp
-					if err := json.NewDecoder(resp.Body).Decode(&tr); err == nil && tr.Token != "" {
-						token = tr.Token
-					}
-				}
-			}
-		}
-		if token != "" {
-			// Use Bearer token for all requests
-			base := http.DefaultTransport
-			repo.Client = &http.Client{
-				Transport: roundTripperWithBearerToken{base, token},
-			}
-		} else if username != "" && password != "" {
-			// Fallback to basic auth
-			base := http.DefaultTransport
-			repo.Client = &http.Client{
-				Transport: roundTripperWithBasicAuth{base, username, password},
-			}
-		}
+	// Use shared registry auth logic
+	scope := ""
+	if strings.HasPrefix(repoRef, "ghcr.io/") {
+		ownerRepo := strings.TrimPrefix(repoRef, "ghcr.io/")
+		scope = "repository:" + ownerRepo + ":push,pull"
+	}
+	client, _, _, _, err := registryauth.GetAuthenticatedClient(cfg, repoRef, scope)
+	if err != nil {
+		return fmt.Errorf("auth error: %w", err)
+	}
+	if client != nil {
+		repo.Client = client
 	}
 	// Push the manifest and its blobs to the remote repository using the manifest digest as the source reference
 	copyOpts := oras.DefaultCopyOptions
@@ -176,51 +132,4 @@ func PushImage(cfg *config.Config, imageRef string, ociType string, files []stri
 		return fmt.Errorf("oras push failed: %w", err)
 	}
 	return nil
-}
-
-type roundTripperWithBasicAuth struct {
-	base     http.RoundTripper
-	username string
-	password string
-}
-
-func (rt roundTripperWithBasicAuth) RoundTrip(req *http.Request) (*http.Response, error) {
-	if rt.username != "" {
-		auth := rt.username + ":" + rt.password
-		header := "Basic " + base64.StdEncoding.EncodeToString([]byte(auth))
-		req.Header.Set("Authorization", header)
-	}
-	// Debug: print HTTP request details including Authorization header
-	if debugHTTP {
-		fmt.Println("--- HTTP Request ---")
-		fmt.Printf("%s %s\n", req.Method, req.URL.String())
-		for k, v := range req.Header {
-			for _, vv := range v {
-				fmt.Printf("%s: %s\n", k, vv)
-			}
-		}
-		fmt.Println("-------------------")
-	}
-	return rt.base.RoundTrip(req)
-}
-
-type roundTripperWithBearerToken struct {
-	base  http.RoundTripper
-	token string
-}
-
-func (rt roundTripperWithBearerToken) RoundTrip(req *http.Request) (*http.Response, error) {
-	req.Header.Set("Authorization", "Bearer "+rt.token)
-	// Debug: print HTTP request details including Bearer token
-	if debugHTTP {
-		fmt.Println("--- HTTP Request ---")
-		fmt.Printf("%s %s\n", req.Method, req.URL.String())
-		for k, v := range req.Header {
-			for _, vv := range v {
-				fmt.Printf("%s: %s\n", k, vv)
-			}
-		}
-		fmt.Println("-------------------")
-	}
-	return rt.base.RoundTrip(req)
 }

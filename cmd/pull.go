@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/thin-edge/tedge-oscar/internal/config"
 	"github.com/thin-edge/tedge-oscar/internal/imagepull"
+	"github.com/thin-edge/tedge-oscar/internal/registryauth"
 )
 
 var pullCmd = &cobra.Command{
@@ -14,6 +15,8 @@ var pullCmd = &cobra.Command{
 	Example: `tedge-oscar flows images pull ghcr.io/reubenmiller/connectivity-counter:1.0`,
 	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		// Enable debug HTTP if logLevel is debug
+		registryauth.SetDebugHTTP(logLevel)
 		cfgPath := configPath
 		if cfgPath == "" {
 			cfgPath = config.DefaultConfigPath()

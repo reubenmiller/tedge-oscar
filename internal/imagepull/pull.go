@@ -5,8 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"net/http"
-	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -16,17 +14,8 @@ import (
 	"oras.land/oras-go/v2/registry/remote"
 
 	"github.com/thin-edge/tedge-oscar/internal/config"
+	"github.com/thin-edge/tedge-oscar/internal/registryauth"
 )
-
-type basicAuthClient struct {
-	username string
-	password string
-}
-
-func (c *basicAuthClient) Do(req *http.Request) (*http.Response, error) {
-	req.SetBasicAuth(c.username, c.password)
-	return http.DefaultClient.Do(req)
-}
 
 func PullImage(cfg *config.Config, imageRef string) error {
 	repoRef, ref := imageRef, ""
@@ -48,19 +37,13 @@ func PullImage(cfg *config.Config, imageRef string) error {
 	if err != nil {
 		return fmt.Errorf("invalid repository: %w", err)
 	}
-	u, err := url.Parse("https://" + repoRef)
-	if err == nil {
-		reg := u.Host
-		var username, password string
-		if cred := cfg.FindCredential(reg); cred != nil {
-			username = cred.Username
-			password = cred.Password
-		} else {
-			username, password, _ = config.LoadDockerCredentials(reg)
-		}
-		if username != "" && password != "" {
-			repo.Client = &basicAuthClient{username: username, password: password}
-		}
+	// Use shared registry auth logic
+	client, _, _, _, err := registryauth.GetAuthenticatedClient(cfg, repoRef, "")
+	if err != nil {
+		return fmt.Errorf("auth error: %w", err)
+	}
+	if client != nil {
+		repo.Client = client
 	}
 	// Pull the image and get the manifest descriptor
 	desc, err := oras.Copy(context.Background(), repo, ref, store, "", oras.DefaultCopyOptions)

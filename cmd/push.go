@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/thin-edge/tedge-oscar/internal/config"
 	"github.com/thin-edge/tedge-oscar/internal/imagepush"
+	"github.com/thin-edge/tedge-oscar/internal/registryauth"
 )
 
 var pushCmd = &cobra.Command{
@@ -15,7 +16,7 @@ var pushCmd = &cobra.Command{
 	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		// Set debugHTTP based on logLevel
-		imagepush.SetDebugHTTP(logLevel)
+		registryauth.SetDebugHTTP(logLevel)
 		cfgPath := configPath
 		if cfgPath == "" {
 			cfgPath = config.DefaultConfigPath()
