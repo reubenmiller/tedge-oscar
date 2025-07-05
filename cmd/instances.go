@@ -155,9 +155,9 @@ var listInstancesCmd = &cobra.Command{
 }
 
 var deployCmd = &cobra.Command{
-	Use:          "deploy [instance_name] [image] [topics...]",
+	Use:          "deploy [instance_name] [image]",
 	Short:        "Deploy a flow instance",
-	Args:         cobra.MinimumNArgs(3),
+	Args:         cobra.ExactArgs(2),
 	SilenceUsage: true, // Do not show help on runtime errors
 	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		// Only complete for the image argument (second arg, index 1)
@@ -204,7 +204,13 @@ var deployCmd = &cobra.Command{
 
 		instanceName := args[0]
 		imageRef := args[1]
-		topics := args[2:]
+		topics, err := cmd.Flags().GetStringArray("topics")
+		if err != nil {
+			return err
+		}
+		if len(topics) == 0 {
+			return fmt.Errorf("at least one --topics value must be provided")
+		}
 		tick := 0
 		if cmd.Flags().Changed("tick") {
 			tick, _ = cmd.Flags().GetInt("tick")
@@ -367,6 +373,50 @@ func init() {
 	instancesCmd.AddCommand(deployCmd)
 	instancesCmd.AddCommand(removeInstanceCmd)
 	deployCmd.Flags().Int("tick", 0, "Tick interval in seconds (optional)")
+	deployCmd.Flags().StringArray("topics", nil, "Input topics (repeatable, required)")
+	deployCmd.MarkFlagRequired("topics")
+	_ = deployCmd.RegisterFlagCompletionFunc("topics", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		// Common thin-edge.io MQTT topics
+		commonTopics := []string{
+			// main device values
+			"te/device/main//\tRegistration (main device)",
+			"te/device/main///m/+\tMeasurements (main device)",
+			"te/device/main///e/+\tEvents (main device)",
+			"te/device/main///a/+\tAlarms (main device)",
+			"te/device/main///twin/+\tTwin (main device)",
+			"te/device/main///cmd/+/+\tCommands (main device)",
+			// all devices/services
+			"te/+/+/+/+\tRegistration (all devices)",
+			"te/+/+/+/+/m/+\tMeasurements (all devices)",
+			"te/+/+/+/+/e/+\tEvents (all devices)",
+			"te/+/+/+/+/a/+\tAlarms (all devices)",
+			"te/+/+/+/+/twin/+\tTwin (all devices)",
+			"te/+/+/+/+/cmd/+/+\tCommands (all devices)",
+		}
+
+		// TODO Add common suffixes to the given users options
+		// commonSuffixes := []string{
+		// 	"/m/",
+		// 	"/e/",
+		// 	"/a/",
+		// 	"/twin/",
+		// 	"/cmd/+/+",
+		// }
+
+		// if len(strings.Split(toComplete, "/")) == 5 {
+		// 	for _, suffix := range commonSuffixes {
+		// 		commonTopics = append(commonTopics, toComplete+suffix)
+		// 	}
+		// }
+
+		var completions []string
+		for _, topic := range commonTopics {
+			if strings.HasPrefix(topic, toComplete) {
+				completions = append(completions, topic)
+			}
+		}
+		return completions, cobra.ShellCompDirectiveNoFileComp
+	})
 	flowsCmd.AddCommand(instancesCmd)
 }
 
