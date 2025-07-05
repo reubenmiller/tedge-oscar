@@ -16,12 +16,22 @@ var imagesCmd = &cobra.Command{
 	Use:     "images",
 	Short:   "Manage flow images as OCI artifacts",
 	Aliases: []string{"image"},
+	Example: `# List all images
+$ tedge-oscar flows images list
+
+# Pull an image from a registry
+$ tedge-oscar flows images pull ghcr.io/reubenmiller/connectivity-counter:1.0
+
+# Push an image to a registry
+$ tedge-oscar flows images push ghcr.io/reubenmiller/connectivity-counter:1.0
+`,
 }
 
 var listImagesCmd = &cobra.Command{
 	Use:     "list",
 	Short:   "List pulled images in the image_dir",
 	Aliases: []string{"ls"},
+	Example: `tedge-oscar flows images list`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cfgPath := configPath
 		if cfgPath == "" {

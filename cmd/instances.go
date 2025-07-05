@@ -18,12 +18,23 @@ import (
 var instancesCmd = &cobra.Command{
 	Use:   "instances",
 	Short: "Manage flow instances",
+	Example: `# List all deployed flow instances
+$ tedge-oscar flows instances list
+
+# Deploy a new instance
+$ tedge-oscar flows instances deploy myinstance ghcr.io/reubenmiller/connectivity-counter:1.0 --topics te/device/main///m/+
+
+# Remove an instance
+$ tedge-oscar flows instances remove myinstance
+`,
 }
 
 var listInstancesCmd = &cobra.Command{
 	Use:          "list",
 	Short:        "List deployed flow instances",
 	Aliases:      []string{"ps", "ls"},
+	Example:      `# List all deployed flow instances
+$ tedge-oscar flows instances list`,
 	SilenceUsage: true, // Do not show help on runtime errors
 	Run: func(cmd *cobra.Command, args []string) {
 		cfgPath := configPath
@@ -172,6 +183,8 @@ var deployCmd = &cobra.Command{
 	Use:          "deploy [instance_name] [image]",
 	Short:        "Deploy a flow instance",
 	Aliases:      []string{"run"},
+	Example:      `# Deploy a new instance using a specific image and topic
+$ tedge-oscar flows instances deploy myinstance ghcr.io/reubenmiller/connectivity-counter:1.0 --topics te/device/main///m/+`,
 	Args:         cobra.ExactArgs(2),
 	SilenceUsage: true, // Do not show help on runtime errors
 	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
@@ -300,6 +313,8 @@ var removeInstanceCmd = &cobra.Command{
 	Use:          "remove [instance_name]",
 	Short:        "Remove a deployed flow instance",
 	Aliases:      []string{"rm"},
+	Example:      `# Remove a deployed instance
+$ tedge-oscar flows instances remove myinstance`,
 	Args:         cobra.ExactArgs(1),
 	SilenceUsage: true, // Do not show help on runtime errors
 	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {

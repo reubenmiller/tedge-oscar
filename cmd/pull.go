@@ -9,9 +9,10 @@ import (
 )
 
 var pullCmd = &cobra.Command{
-	Use:   "pull [image]",
-	Short: "Pull a flow image from an OCI registry",
-	Args:  cobra.ExactArgs(1),
+	Use:     "pull [image]",
+	Short:   "Pull a flow image from an OCI registry",
+	Example: `tedge-oscar flows images pull ghcr.io/reubenmiller/connectivity-counter:1.0`,
+	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cfgPath := configPath
 		if cfgPath == "" {
