@@ -203,20 +203,25 @@ var deployCmd = &cobra.Command{
 		}
 
 		tomlPath := filepath.Join(deployDir, instanceName+".toml")
+		type stageTOML struct {
+			Filter           string `toml:"filter"`
+			TickEverySeconds *int   `toml:"tick_every_seconds,omitempty"`
+		}
+		stages := []stageTOML{}
+		var tickPtr *int
+		if tick > 0 {
+			tickPtr = &tick
+		}
+		stages = append(stages, stageTOML{
+			Filter:           filterPath,
+			TickEverySeconds: tickPtr,
+		})
 		data := struct {
-			InputTopics []string `toml:"input_topics"`
-			Stages      []struct {
-				Filter           string `toml:"filter"`
-				TickEverySeconds int    `toml:"tick_every_seconds,omitempty"`
-			} `toml:"stages"`
+			InputTopics []string    `toml:"input_topics"`
+			Stages      []stageTOML `toml:"stages"`
 		}{
 			InputTopics: topics,
-			Stages: []struct {
-				Filter           string `toml:"filter"`
-				TickEverySeconds int    `toml:"tick_every_seconds,omitempty"`
-			}{
-				{Filter: filterPath, TickEverySeconds: tick},
-			},
+			Stages:      stages,
 		}
 		f, err := os.Create(tomlPath)
 		if err != nil {
