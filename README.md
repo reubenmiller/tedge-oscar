@@ -51,6 +51,18 @@ A Go CLI tool to manage thin-edge.io flows, including pulling and pushing flow i
 
 ## Getting Started
 
+### Install via golang
+
+You can install the CLI directly from the repository using Go 1.21+:
+
+```sh
+go install github.com/reubenmiller/tedge-oscar/cmd/tedge-oscar@latest
+```
+
+This will place the `tedge-oscar` binary in your `$GOBIN` (usually `$HOME/go/bin`). Make sure this directory is in your `$PATH`.
+
+### Build from Source
+
 1. Install Go 1.21 or newer
 2. Run `go mod tidy` to install dependencies
 3. Build: `go build`
