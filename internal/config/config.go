@@ -21,6 +21,9 @@ type Config struct {
 }
 
 func DefaultConfigPath() string {
+	if envPath := os.Getenv("TEDGE_OSCAR_CONFIG"); envPath != "" {
+		return envPath
+	}
 	home, err := os.UserHomeDir()
 	if err != nil {
 		return "./tedge-oscar.toml"
