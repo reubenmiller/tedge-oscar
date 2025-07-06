@@ -2,7 +2,9 @@ package cmd
 
 import (
 	"fmt"
+	"path/filepath"
 
+	"github.com/reubenmiller/tedge-oscar/internal/artifact"
 	"github.com/reubenmiller/tedge-oscar/internal/config"
 	"github.com/reubenmiller/tedge-oscar/internal/imagepull"
 	"github.com/reubenmiller/tedge-oscar/internal/registryauth"
@@ -26,14 +28,23 @@ var pullCmd = &cobra.Command{
 			return fmt.Errorf("failed to load config: %w", err)
 		}
 		imageRef := args[0]
-		if err := imagepull.PullImage(cfg, imageRef); err != nil {
+		outputDir, _ := cmd.Flags().GetString("output-dir")
+		if outputDir == "" {
+			name, err := artifact.ParseName(imageRef, false)
+			if err != nil {
+				return err
+			}
+			outputDir = filepath.Join(cfg.ImageDir, name)
+		}
+		if err := imagepull.PullImage(cfg, imageRef, outputDir); err != nil {
 			return err
 		}
-		fmt.Fprintf(cmd.ErrOrStderr(), "Image %s pulled to %s\n", imageRef, cfg.ImageDir)
+		fmt.Fprintf(cmd.ErrOrStderr(), "Image %s pulled to %s\n", imageRef, outputDir)
 		return nil
 	},
 }
 
 func init() {
+	pullCmd.Flags().String("output-dir", "", "Directory to download the artifact contents to (default: config image_dir)")
 	imagesCmd.AddCommand(pullCmd)
 }

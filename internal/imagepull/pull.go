@@ -17,7 +17,8 @@ import (
 	"github.com/reubenmiller/tedge-oscar/internal/registryauth"
 )
 
-func PullImage(cfg *config.Config, imageRef string) error {
+// PullImage pulls an OCI artifact and stores its contents in outputDir.
+func PullImage(cfg *config.Config, imageRef string, outputDir string) error {
 	repoRef, ref := imageRef, ""
 	if i := strings.LastIndex(imageRef, ":"); i > strings.LastIndex(imageRef, "/") {
 		repoRef = imageRef[:i]
@@ -29,7 +30,7 @@ func PullImage(cfg *config.Config, imageRef string) error {
 	if repoRef == imageRef || ref == "" {
 		return fmt.Errorf("image reference must include a tag or digest, e.g. ghcr.io/user/repo:tag or @sha256:<hash>")
 	}
-	store, err := file.New(cfg.ImageDir)
+	store, err := file.New(outputDir)
 	if err != nil {
 		return fmt.Errorf("failed to open image dir: %w", err)
 	}
@@ -54,11 +55,7 @@ func PullImage(cfg *config.Config, imageRef string) error {
 	// Save the manifest JSON to the image folder
 	manifestBytes, err := store.Fetch(context.Background(), desc)
 	if err == nil {
-		repoDir := repoRef
-		if i := strings.LastIndex(repoRef, "/"); i != -1 {
-			repoDir = repoRef[i+1:]
-		}
-		manifestPath := filepath.Join(cfg.ImageDir, repoDir, "manifest.json")
+		manifestPath := filepath.Join(outputDir, "manifest.json")
 		var data []byte
 		// manifestBytes is already io.ReadCloser
 		rc := manifestBytes

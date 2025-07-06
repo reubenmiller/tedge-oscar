@@ -9,6 +9,7 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/olekukonko/tablewriter"
+	"github.com/reubenmiller/tedge-oscar/internal/artifact"
 	"github.com/reubenmiller/tedge-oscar/internal/config"
 	"github.com/reubenmiller/tedge-oscar/internal/imagepull"
 	"github.com/reubenmiller/tedge-oscar/internal/util"
@@ -272,17 +273,17 @@ $ tedge-oscar flows instances deploy myinstance ghcr.io/reubenmiller/connectivit
 		}
 
 		// Extract repository part from image reference (remove tag/digest)
-		repoDir := imageRef
-		if i := strings.IndexAny(imageRef, ":@"); i != -1 {
-			repoDir = filepath.Base(imageRef[:i])
+		name, err := artifact.ParseName(imageRef, false)
+		if err != nil {
+			return err
 		}
-		repoDir = strings.TrimSuffix(repoDir, "/")
-		imagePath := filepath.Join(cfg.ImageDir, repoDir)
+
+		imagePath := filepath.Join(cfg.ImageDir, name)
 		filterPath := filepath.Join(imagePath, "dist/main.mjs")
 
 		if _, err := os.Stat(imagePath); os.IsNotExist(err) {
 			fmt.Fprintf(cmd.ErrOrStderr(), "Image %s not found locally. Pulling...\n", imageRef)
-			if err := imagepull.PullImage(cfg, imageRef); err != nil {
+			if err := imagepull.PullImage(cfg, imageRef, cfg.ImageDir); err != nil {
 				return fmt.Errorf("failed to pull image: %w", err)
 			}
 		}

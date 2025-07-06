@@ -2,7 +2,6 @@ package imagepush
 
 import (
 	"bytes"
-	"compress/gzip"
 	"context"
 	"fmt"
 	"os"
@@ -45,29 +44,19 @@ func PushImage(cfg *config.Config, imageRef string, ociType string, files []stri
 			return fmt.Errorf("failed to determine relative path for %s: %w", f, err)
 		}
 		relPath = filepath.ToSlash(relPath) // OCI prefers forward slashes
+		if relPath == "" || relPath == "." || strings.Contains(relPath, "..") {
+			return fmt.Errorf("invalid relative path for file %s: got '%s' (root: %s)", f, relPath, rootDir)
+		}
 		mediaType := "application/octet-stream"
 		var contentReader *bytes.Reader
-		if strings.HasPrefix(repoRef, "ghcr.io/") {
-			// ghcr.io expects image layers to have this media type and be gzipped
-			mediaType = "application/vnd.oci.image.layer.v1.tar+gzip"
-			var buf bytes.Buffer
-			gz := gzip.NewWriter(&buf)
-			if _, err := gz.Write(data); err != nil {
-				return fmt.Errorf("failed to gzip file %s: %w", f, err)
-			}
-			gz.Close()
-			data = buf.Bytes()
-			contentReader = bytes.NewReader(data)
-		} else {
-			if strings.HasSuffix(f, ".json") {
-				mediaType = "application/json"
-			} else if strings.HasSuffix(f, ".toml") {
-				mediaType = "application/toml"
-			} else if strings.HasSuffix(f, ".mjs") {
-				mediaType = "application/javascript"
-			}
-			contentReader = bytes.NewReader(data)
+		if strings.HasSuffix(f, ".json") {
+			mediaType = "application/json"
+		} else if strings.HasSuffix(f, ".toml") {
+			mediaType = "application/toml"
+		} else if strings.HasSuffix(f, ".mjs") || strings.HasSuffix(f, ".js") {
+			mediaType = "application/javascript"
 		}
+		contentReader = bytes.NewReader(data)
 		d := ocispec.Descriptor{
 			MediaType:   mediaType,
 			Digest:      digest.FromBytes(data),

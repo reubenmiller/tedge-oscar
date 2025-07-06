@@ -9,6 +9,7 @@ import (
 	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/cobra"
 
+	"github.com/reubenmiller/tedge-oscar/internal/artifact"
 	"github.com/reubenmiller/tedge-oscar/internal/config"
 	"github.com/reubenmiller/tedge-oscar/internal/util"
 )
@@ -62,7 +63,8 @@ var listImagesCmd = &cobra.Command{
 			if !entry.IsDir() {
 				continue
 			}
-			manifestPath := filepath.Join(imageDir, entry.Name(), "manifest.json")
+			imageDir := filepath.Join(imageDir, entry.Name())
+			manifestPath := filepath.Join(imageDir, "manifest.json")
 			version := "<unknown>"
 			digest := "<unknown>"
 			if f, err := os.Open(manifestPath); err == nil {
@@ -84,13 +86,13 @@ var listImagesCmd = &cobra.Command{
 				}
 				f.Close()
 			}
-			rows = append(rows, []string{entry.Name(), version, digest})
+			rows = append(rows, []string{artifact.TrimVersion(entry.Name()), version, digest, imageDir})
 		}
 		if len(rows) == 0 {
 			fmt.Fprintf(cmd.ErrOrStderr(), "No images found in image_dir (%s).\n", unexpandedImageDir)
 			return nil
 		}
-		colNames := []string{"image", "version", "digest"}
+		colNames := []string{"image", "version", "digest", "imageDir"}
 		if outputFormat == "jsonl" {
 			for _, row := range rows {
 				obj := map[string]string{}
