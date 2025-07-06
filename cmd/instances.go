@@ -443,6 +443,8 @@ func init() {
 			"te/device/main///a/+\tAlarms (main device)",
 			"te/device/main///twin/+\tTwin (main device)",
 			"te/device/main///cmd/+/+\tCommands (main device)",
+			"te/device/main/service/service/tedge-mapper-bridge-c8y/status/health\tbuilt-in bridge status",
+			"te/device/main/service/service/mosquitto-c8y-bridge/status/health\tmosquitto bridge status",
 			// all devices/services
 			"te/+/+/+/+\tRegistration (all devices)",
 			"te/+/+/+/+/m/+\tMeasurements (all devices)",
