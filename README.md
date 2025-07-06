@@ -68,6 +68,10 @@ This will place the `tedge-oscar` binary in your `$GOBIN` (usually `$HOME/go/bin
 3. Build: `go build`
 4. Run: `./tedge-oscar [command]`
 
+### References
+
+* https://www.kenmuse.com/blog/universal-packages-on-github-with-oras/
+
 ## License
 
 Apache 2.0
