@@ -130,7 +130,7 @@ $ tedge-oscar flows instances list`,
 				// Try to extract the image directory name from the path
 				imgDir := filepath.Base(filepath.Dir(filepath.Dir(data.Stages[0].Filter)))
 				if imgDir != "." && imgDir != "/" && imgDir != "" {
-					imageName = imgDir
+					imageName = artifact.TrimVersion(imgDir)
 				}
 			}
 			rows = append(rows, []string{name, path, topics, imageName, imageVersion})
