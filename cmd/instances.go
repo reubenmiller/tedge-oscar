@@ -280,6 +280,7 @@ $ tedge-oscar flows instances deploy myinstance ghcr.io/reubenmiller/connectivit
 
 		imagePath := filepath.Join(cfg.ImageDir, name)
 		filterPath := filepath.Join(imagePath, "dist/main.mjs")
+		fmt.Fprintf(cmd.ErrOrStderr(), "filter path: %s\n", filterPath)
 
 		if _, err := os.Stat(imagePath); os.IsNotExist(err) {
 			fmt.Fprintf(cmd.ErrOrStderr(), "Image %s not found locally. Pulling...\n", imageRef)
@@ -294,36 +295,78 @@ $ tedge-oscar flows instances deploy myinstance ghcr.io/reubenmiller/connectivit
 		}
 
 		tomlPath := filepath.Join(deployDir, instanceName+".toml")
-		type stageTOML struct {
-			Filter           string `toml:"filter"`
-			TickEverySeconds *int   `toml:"tick_every_seconds,omitempty"`
+		imagePipelinePath := filepath.Join(imagePath, "pipeline.toml")
+		if _, err := os.Stat(imagePipelinePath); err == nil {
+			// Load pipeline.toml as a map to preserve all fields
+			var m map[string]interface{}
+			if _, err := toml.DecodeFile(imagePipelinePath, &m); err != nil {
+				return fmt.Errorf("failed to parse pipeline.toml: %w", err)
+			}
+			// Always update topics from CLI
+			m["input_topics"] = topics
+			// If tick is set, update all stages with tick value
+			if stagesRaw, ok := m["stages"]; ok {
+				var newStages []map[string]interface{}
+				switch stages := stagesRaw.(type) {
+				case []map[string]interface{}:
+					newStages = make([]map[string]interface{}, len(stages))
+					for i, stageMap := range stages {
+						stageMap["filter"] = filterPath
+						if tick > 0 {
+							stageMap["tick_every_seconds"] = tick
+						}
+						newStages[i] = stageMap
+					}
+				case []interface{}:
+					newStages = make([]map[string]interface{}, len(stages))
+					for i, s := range stages {
+						if stageMap, ok := s.(map[string]interface{}); ok {
+							stageMap["filter"] = filterPath
+							if tick > 0 {
+								stageMap["tick_every_seconds"] = tick
+							}
+							newStages[i] = stageMap
+						}
+					}
+				}
+				m["stages"] = newStages
+			}
+			f, err := os.Create(tomlPath)
+			if err != nil {
+				return err
+			}
+			defer f.Close()
+			if err := toml.NewEncoder(f).Encode(m); err != nil {
+				return err
+			}
+			fmt.Fprintf(cmd.ErrOrStderr(), "Instance %s deployed at %s\n", instanceName, tomlPath)
+			return nil
+		} else {
+			// Fallback: create minimal config
+			var tickPtr *int
+			if tick > 0 {
+				tickPtr = &tick
+			}
+			data := map[string]interface{}{
+				"input_topics": topics,
+				"stages": []map[string]interface{}{
+					{
+						"filter":             filterPath,
+						"tick_every_seconds": tickPtr,
+					},
+				},
+			}
+			f, err := os.Create(tomlPath)
+			if err != nil {
+				return err
+			}
+			defer f.Close()
+			if err := toml.NewEncoder(f).Encode(data); err != nil {
+				return err
+			}
+			fmt.Fprintf(cmd.ErrOrStderr(), "Instance %s deployed at %s\n", instanceName, tomlPath)
+			return nil
 		}
-		stages := []stageTOML{}
-		var tickPtr *int
-		if tick > 0 {
-			tickPtr = &tick
-		}
-		stages = append(stages, stageTOML{
-			Filter:           filterPath,
-			TickEverySeconds: tickPtr,
-		})
-		data := struct {
-			InputTopics []string    `toml:"input_topics"`
-			Stages      []stageTOML `toml:"stages"`
-		}{
-			InputTopics: topics,
-			Stages:      stages,
-		}
-		f, err := os.Create(tomlPath)
-		if err != nil {
-			return err
-		}
-		defer f.Close()
-		if err := toml.NewEncoder(f).Encode(data); err != nil {
-			return err
-		}
-		fmt.Fprintf(cmd.ErrOrStderr(), "Instance %s deployed at %s\n", instanceName, tomlPath)
-		return nil
 	},
 }
 
@@ -443,8 +486,8 @@ func init() {
 			"te/device/main///a/+\tAlarms (main device)",
 			"te/device/main///twin/+\tTwin (main device)",
 			"te/device/main///cmd/+/+\tCommands (main device)",
-			"te/device/main/service/service/tedge-mapper-bridge-c8y/status/health\tbuilt-in bridge status",
-			"te/device/main/service/service/mosquitto-c8y-bridge/status/health\tmosquitto bridge status",
+			"te/device/main/service/tedge-mapper-bridge-c8y/status/health\tbuilt-in bridge status",
+			"te/device/main/service/mosquitto-c8y-bridge/status/health\tmosquitto bridge status",
 			// all devices/services
 			"te/+/+/+/+\tRegistration (all devices)",
 			"te/+/+/+/+/m/+\tMeasurements (all devices)",
