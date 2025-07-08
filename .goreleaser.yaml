@@ -1,0 +1,80 @@
+version: 2
+project_name: tedge-oscar
+builds:
+  - id: tedge-oscar
+    main: ./main.go
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+      - arm
+      - "386"
+      - riscv64
+      - mips
+      - mips64
+    goarm:
+      - "5"
+      - "6"
+      - "7"
+    goriscv64:
+      - rva22u64
+    env:
+      - CGO_ENABLED=0
+archives:
+  - id: default
+    ids: [tedge-oscar]
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
+    files:
+      - LICENSE
+      - README.md
+      - example-config.toml
+checksum:
+  name_template: "checksums.txt"
+snapshot:
+  version_template: "next"
+changelog:
+  sort: desc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+
+nfpms:
+  - id: deb
+    ids: [tedge-oscar]
+    priority: optional
+    maintainer: "tedge-oscar maintainers <tedge-oscar@thin-edge.io>"
+    description: "CLI for managing thin-edge.io flows and OCI images."
+    vendor: "thin-edge.io"
+    homepage: "https://github.com/reubenmiller/tedge-oscar"
+    license: "Apache-2.0"
+    bindir: /usr/bin
+    contents:
+      - src: ./example-config.toml
+        dst: /etc/tedge-oscar/example-config.toml
+      - src: ./LICENSE
+        dst: /usr/share/doc/tedge-oscar/LICENSE
+      - src: ./README.md
+        dst: /usr/share/doc/tedge-oscar/README.md
+  - id: rpm
+    ids: [tedge-oscar]
+    priority: optional
+    maintainer: "tedge-oscar maintainers <tedge-oscar@thin-edge.io>"
+    description: "CLI for managing thin-edge.io flows and OCI images."
+    vendor: "thin-edge.io"
+    homepage: "https://github.com/reubenmiller/tedge-oscar"
+    license: "Apache-2.0"
+    bindir: /usr/bin
+    contents:
+      - src: ./example-config.toml
+        dst: /etc/tedge-oscar/example-config.toml
+      - src: ./LICENSE
+        dst: /usr/share/doc/tedge-oscar/LICENSE
+      - src: ./README.md
+        dst: /usr/share/doc/tedge-oscar/README.md
