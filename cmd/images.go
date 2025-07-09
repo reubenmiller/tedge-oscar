@@ -108,8 +108,10 @@ var listImagesCmd = &cobra.Command{
 			return nil
 		}
 		maxWidth := 0
+		tablePadding := 2 // left + right border
+		columnPadding := 2
 		if w, _, err := terminalSize(); err == nil {
-			maxWidth = w
+			maxWidth = w - tablePadding
 		} else {
 			maxWidth = 120 // fallback
 		}
@@ -126,7 +128,7 @@ var listImagesCmd = &cobra.Command{
 		}
 		total := len(colNames) - 1 // for separators
 		for _, w := range colWidths {
-			total += w
+			total += (w + columnPadding)
 		}
 		keep := len(colNames)
 		for total > maxWidth && keep > 1 {
