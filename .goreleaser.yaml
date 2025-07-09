@@ -33,7 +33,6 @@ archives:
     files:
       - LICENSE
       - README.md
-      - example-config.toml
 checksum:
   name_template: "checksums.txt"
 snapshot:
@@ -56,8 +55,6 @@ nfpms:
     license: "Apache-2.0"
     bindir: /usr/bin
     contents:
-      - src: ./example-config.toml
-        dst: /etc/tedge-oscar/example-config.toml
       - src: ./LICENSE
         dst: /usr/share/doc/tedge-oscar/LICENSE
       - src: ./README.md
@@ -72,8 +69,6 @@ nfpms:
     license: "Apache-2.0"
     bindir: /usr/bin
     contents:
-      - src: ./example-config.toml
-        dst: /etc/tedge-oscar/example-config.toml
       - src: ./LICENSE
         dst: /usr/share/doc/tedge-oscar/LICENSE
       - src: ./README.md
