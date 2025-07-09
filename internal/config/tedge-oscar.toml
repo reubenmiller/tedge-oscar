@@ -1,7 +1,7 @@
 # Example tedge-oscar configuration (TOML format)
 
 # Directory where pulled OCI images will be stored
-image_dir = "$HOME/.tedge/images"
+image_dir = "$TEDGE_CONFIG_DIR/flows/images"
 
 # Directory where deployment instance TOML files will be written
 # (optional, defaults to <image_dir>/../deployments if not set)

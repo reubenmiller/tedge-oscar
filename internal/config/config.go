@@ -2,6 +2,7 @@ package config
 
 import (
 	"context"
+	_ "embed"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -9,6 +10,9 @@ import (
 	"github.com/BurntSushi/toml"
 	"oras.land/oras-go/v2/registry/remote/credentials"
 )
+
+//go:embed tedge-oscar.toml
+var embeddedConfig []byte
 
 type RegistryCredential struct {
 	Registry string `toml:"registry" json:"registry" yaml:"registry"`
@@ -51,17 +55,25 @@ func (c *Config) Expand() {
 	}
 }
 
-func LoadConfig(path string) (*Config, error) {
+func loadEmbeddedConfig() (*Config, error) {
 	var cfg Config
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		// Use sensible defaults if config file is missing
-		fmt.Fprintf(os.Stderr, "Warning: config file not found: %s. Using default settings.\n", path)
-		home, _ := os.UserHomeDir()
-		cfg.ImageDir = filepath.Join(home, ".tedge", "images")
-		cfg.DeployDir = filepath.Join(home, ".tedge", "deployments")
-		cfg.Expand()
-		return &cfg, nil
+	if err := toml.Unmarshal(embeddedConfig, &cfg); err != nil {
+		return &cfg, fmt.Errorf("failed to load embedded config: %w", err)
 	}
+	cfg.Expand()
+	return &cfg, nil
+}
+
+func LoadConfig(path string) (*Config, error) {
+	// Set default tedge config dir
+	if v := os.Getenv("TEDGE_CONFIG_DIR"); v == "" {
+		os.Setenv("TEDGE_CONFIG_DIR", "/etc/tedge")
+	}
+
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		return loadEmbeddedConfig()
+	}
+	var cfg Config
 	if _, err := toml.DecodeFile(path, &cfg); err != nil {
 		return nil, err
 	}
