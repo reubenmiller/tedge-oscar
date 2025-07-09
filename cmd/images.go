@@ -54,9 +54,12 @@ var listImagesCmd = &cobra.Command{
 		if imageDir == "" {
 			return fmt.Errorf("image_dir not set in config")
 		}
+		// Don't fail if directory does not exist
 		entries, err := os.ReadDir(imageDir)
 		if err != nil {
-			return fmt.Errorf("failed to read image_dir: %w", err)
+			if !os.IsNotExist(err) {
+				return fmt.Errorf("failed to read image_dir. Check the permissions of the folder. %w", err)
+			}
 		}
 		rows := [][]string{}
 		for _, entry := range entries {
