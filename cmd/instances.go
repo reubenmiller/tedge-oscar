@@ -139,7 +139,7 @@ $ tedge-oscar flows instances list`,
 			fmt.Fprintln(cmd.ErrOrStderr(), "No flow instances are currently deployed.")
 			return nil
 		}
-		if outputFormat == "jsonl" {
+		if outputFormat == "jsonl" || outputFormat == "json" {
 			for _, row := range rows {
 				obj := map[string]string{}
 				for i, col := range colNames {

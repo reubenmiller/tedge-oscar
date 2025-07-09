@@ -93,7 +93,7 @@ var listImagesCmd = &cobra.Command{
 			return nil
 		}
 		colNames := []string{"image", "version", "digest", "imageDir"}
-		if outputFormat == "jsonl" {
+		if outputFormat == "jsonl" || outputFormat == "json" {
 			for _, row := range rows {
 				obj := map[string]string{}
 				for i, col := range colNames {
