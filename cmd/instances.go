@@ -153,19 +153,21 @@ $ tedge-oscar flows instances list`,
 		}
 		// Determine which columns fit in one row
 		maxWidth := 0
+		tablePadding := 2 // left + right border
+		columnPadding := 2
 		if w, _, err := terminalSize(); err == nil {
-			maxWidth = w
+			maxWidth = w - tablePadding
 		} else {
 			maxWidth = 120 // fallback
 		}
 		colWidths := make([]int, len(colNames))
 		for i := range colNames {
-			colWidths[i] = len(colNames[i])
+			colWidths[i] = len(colNames[i]) + columnPadding
 		}
 		for _, row := range rows {
 			for i, cell := range row {
 				if l := len(cell); l > colWidths[i] {
-					colWidths[i] = l
+					colWidths[i] = l + columnPadding
 				}
 			}
 		}
@@ -177,7 +179,7 @@ $ tedge-oscar flows instances list`,
 		keep := len(colNames)
 		for total > maxWidth && keep > 1 {
 			keep--
-			total -= colWidths[keep] + 1
+			total -= (colWidths[keep] + 1)
 		}
 		// Prepare filtered columns
 		filteredColNames := colNames[:keep]

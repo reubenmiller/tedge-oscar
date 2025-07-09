@@ -117,18 +117,18 @@ var listImagesCmd = &cobra.Command{
 		}
 		colWidths := make([]int, len(colNames))
 		for i := range colNames {
-			colWidths[i] = len(colNames[i])
+			colWidths[i] = len(colNames[i]) + columnPadding
 		}
 		for _, row := range rows {
 			for i, cell := range row {
 				if l := len(cell); l > colWidths[i] {
-					colWidths[i] = l
+					colWidths[i] = l + columnPadding
 				}
 			}
 		}
 		total := len(colNames) - 1 // for separators
 		for _, w := range colWidths {
-			total += (w + columnPadding)
+			total += w
 		}
 		keep := len(colNames)
 		for total > maxWidth && keep > 1 {
