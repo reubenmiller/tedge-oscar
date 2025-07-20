@@ -83,19 +83,19 @@ $ tedge-oscar flows instances list`,
 			name := strings.TrimSuffix(file.Name(), ".toml")
 			path := filepath.Join(unexpandedDeployDir, file.Name())
 			type stage struct {
-				Filter string `toml:"filter"`
+				Script string `toml:"script"`
 			}
 			var data struct {
 				InputTopics []string `toml:"input_topics"`
-				Stages      []stage  `toml:"stages"`
+				Steps       []stage  `toml:"steps"`
 			}
 			topics := ""
 			image := "<invalid>"
 			imageVersion := "<unknown>"
-			if _, err := toml.DecodeFile(filepath.Join(deployDir, file.Name()), &data); err == nil && len(data.Stages) > 0 {
+			if _, err := toml.DecodeFile(filepath.Join(deployDir, file.Name()), &data); err == nil && len(data.Steps) > 0 {
 				topics = strings.Join(data.InputTopics, ", ")
 				// If the image path starts with the expanded imageDir, replace with unexpanded
-				imgPath := data.Stages[0].Filter
+				imgPath := data.Steps[0].Script
 				if strings.HasPrefix(imgPath, cfg.ImageDir) && unexpandedImageDir != "" {
 					rel, err := filepath.Rel(cfg.ImageDir, imgPath)
 					if err == nil {
@@ -105,9 +105,9 @@ $ tedge-oscar flows instances list`,
 				image = imgPath
 				// Try to get image version from manifest.json
 				manifestPath := ""
-				if strings.HasPrefix(data.Stages[0].Filter, cfg.ImageDir) {
+				if strings.HasPrefix(data.Steps[0].Script, cfg.ImageDir) {
 					// e.g. /Users/you/.tedge/images/imagename/dist/main.mjs
-					imgDir := filepath.Dir(filepath.Dir(data.Stages[0].Filter))
+					imgDir := filepath.Dir(filepath.Dir(data.Steps[0].Script))
 					manifestPath = filepath.Join(imgDir, "manifest.json")
 				}
 				if manifestPath != "" {
@@ -128,7 +128,7 @@ $ tedge-oscar flows instances list`,
 			imageName := "<invalid>"
 			if image != "<invalid>" {
 				// Try to extract the image directory name from the path
-				imgDir := filepath.Base(filepath.Dir(filepath.Dir(data.Stages[0].Filter)))
+				imgDir := filepath.Base(filepath.Dir(filepath.Dir(data.Steps[0].Script)))
 				if imgDir != "." && imgDir != "/" && imgDir != "" {
 					imageName = artifact.TrimVersion(imgDir)
 				}
@@ -281,8 +281,8 @@ $ tedge-oscar flows instances deploy myinstance ghcr.io/reubenmiller/connectivit
 		}
 
 		imagePath := filepath.Join(cfg.ImageDir, name)
-		filterPath := filepath.Join(imagePath, "dist/main.mjs")
-		fmt.Fprintf(cmd.ErrOrStderr(), "filter path: %s\n", filterPath)
+		scriptPath := filepath.Join(imagePath, "dist/main.mjs")
+		fmt.Fprintf(cmd.ErrOrStderr(), "script path: %s\n", scriptPath)
 
 		if _, err := os.Stat(imagePath); os.IsNotExist(err) {
 			fmt.Fprintf(cmd.ErrOrStderr(), "Image %s not found locally. Pulling...\n", imageRef)
@@ -291,8 +291,8 @@ $ tedge-oscar flows instances deploy myinstance ghcr.io/reubenmiller/connectivit
 			}
 		}
 
-		if _, err := os.Stat(filterPath); os.IsNotExist(err) {
-			fmt.Fprintf(cmd.ErrOrStderr(), "Image %s does not contain the expected entrypoint. path=%s\n", imageRef, filterPath)
+		if _, err := os.Stat(scriptPath); os.IsNotExist(err) {
+			fmt.Fprintf(cmd.ErrOrStderr(), "Image %s does not contain the expected entrypoint. path=%s\n", imageRef, scriptPath)
 			return err
 		}
 
@@ -306,32 +306,32 @@ $ tedge-oscar flows instances deploy myinstance ghcr.io/reubenmiller/connectivit
 			}
 			// Always update topics from CLI
 			m["input_topics"] = topics
-			// If tick is set, update all stages with tick value
-			if stagesRaw, ok := m["stages"]; ok {
-				var newStages []map[string]interface{}
-				switch stages := stagesRaw.(type) {
+			// If tick is set, update all steps with tick value
+			if stepsRaw, ok := m["steps"]; ok {
+				var newSteps []map[string]interface{}
+				switch steps := stepsRaw.(type) {
 				case []map[string]interface{}:
-					newStages = make([]map[string]interface{}, len(stages))
-					for i, stageMap := range stages {
-						stageMap["filter"] = filterPath
+					newSteps = make([]map[string]interface{}, len(steps))
+					for i, stepMap := range steps {
+						stepMap["script"] = scriptPath
 						if tick > 0 {
-							stageMap["tick_every_seconds"] = tick
+							stepMap["tick_every_seconds"] = tick
 						}
-						newStages[i] = stageMap
+						newSteps[i] = stepMap
 					}
 				case []interface{}:
-					newStages = make([]map[string]interface{}, len(stages))
-					for i, s := range stages {
+					newSteps = make([]map[string]interface{}, len(steps))
+					for i, s := range steps {
 						if stageMap, ok := s.(map[string]interface{}); ok {
-							stageMap["filter"] = filterPath
+							stageMap["script"] = scriptPath
 							if tick > 0 {
 								stageMap["tick_every_seconds"] = tick
 							}
-							newStages[i] = stageMap
+							newSteps[i] = stageMap
 						}
 					}
 				}
-				m["stages"] = newStages
+				m["steps"] = newSteps
 			}
 			f, err := os.Create(tomlPath)
 			if err != nil {
@@ -351,9 +351,9 @@ $ tedge-oscar flows instances deploy myinstance ghcr.io/reubenmiller/connectivit
 			}
 			data := map[string]interface{}{
 				"input_topics": topics,
-				"stages": []map[string]interface{}{
+				"steps": []map[string]interface{}{
 					{
-						"filter":             filterPath,
+						"script":             scriptPath,
 						"tick_every_seconds": tickPtr,
 					},
 				},
