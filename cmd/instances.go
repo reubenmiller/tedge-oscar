@@ -297,12 +297,20 @@ $ tedge-oscar flows instances deploy myinstance ghcr.io/reubenmiller/connectivit
 		}
 
 		tomlPath := filepath.Join(deployDir, instanceName+".toml")
-		imagePipelinePath := filepath.Join(imagePath, "pipeline.toml")
-		if _, err := os.Stat(imagePipelinePath); err == nil {
-			// Load pipeline.toml as a map to preserve all fields
+		// Look for the first existing TOML config file in priority order
+		var imageFlowDefinitionPath string
+		for _, candidate := range []string{"flow.toml", "pipeline.toml"} {
+			candidatePath := filepath.Join(imagePath, candidate)
+			if _, err := os.Stat(candidatePath); err == nil {
+				imageFlowDefinitionPath = candidatePath
+				break
+			}
+		}
+		if _, err := os.Stat(imageFlowDefinitionPath); err == nil {
+			// Load flow definition as a map to preserve all fields
 			var m map[string]interface{}
-			if _, err := toml.DecodeFile(imagePipelinePath, &m); err != nil {
-				return fmt.Errorf("failed to parse pipeline.toml: %w", err)
+			if _, err := toml.DecodeFile(imageFlowDefinitionPath, &m); err != nil {
+				return fmt.Errorf("failed to parse %s: %w", imageFlowDefinitionPath, err)
 			}
 			// Always update topics from CLI
 			m["input_topics"] = topics
