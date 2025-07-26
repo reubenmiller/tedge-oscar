@@ -13,6 +13,8 @@ import (
 	"github.com/reubenmiller/tedge-oscar/internal/config"
 	"github.com/reubenmiller/tedge-oscar/internal/imagepull"
 	"github.com/reubenmiller/tedge-oscar/internal/util"
+	"github.com/reubenmiller/tedge-oscar/pkg/maputil"
+	"github.com/reubenmiller/tedge-oscar/pkg/types/flows"
 	"github.com/spf13/cobra"
 	"golang.org/x/term"
 )
@@ -82,18 +84,12 @@ $ tedge-oscar flows instances list`,
 			}
 			name := strings.TrimSuffix(file.Name(), ".toml")
 			path := filepath.Join(unexpandedDeployDir, file.Name())
-			type stage struct {
-				Script string `toml:"script"`
-			}
-			var data struct {
-				InputTopics []string `toml:"input_topics"`
-				Steps       []stage  `toml:"steps"`
-			}
+			var data flows.InstanceFile
 			topics := ""
 			image := "<invalid>"
 			imageVersion := "<unknown>"
 			if _, err := toml.DecodeFile(filepath.Join(deployDir, file.Name()), &data); err == nil && len(data.Steps) > 0 {
-				topics = strings.Join(data.InputTopics, ", ")
+				topics = strings.Join(data.Input.MQTT.Topics, ", ")
 				// If the image path starts with the expanded imageDir, replace with unexpanded
 				imgPath := data.Steps[0].Script
 				if strings.HasPrefix(imgPath, cfg.ImageDir) && unexpandedImageDir != "" {
@@ -312,8 +308,10 @@ $ tedge-oscar flows instances deploy myinstance ghcr.io/reubenmiller/connectivit
 			if _, err := toml.DecodeFile(imageFlowDefinitionPath, &m); err != nil {
 				return fmt.Errorf("failed to parse %s: %w", imageFlowDefinitionPath, err)
 			}
-			// Always update topics from CLI
-			m["input_topics"] = topics
+			// Always update topics from CLI using a helper to set nested keys
+			if err := maputil.SetNestedMapValue(m, []string{"input", "mqtt", "topics"}, topics); err != nil {
+				return fmt.Errorf("failed to set input.mqtt.topics: %w", err)
+			}
 			// If tick is set, update all steps with tick value
 			if stepsRaw, ok := m["steps"]; ok {
 				var newSteps []map[string]interface{}
