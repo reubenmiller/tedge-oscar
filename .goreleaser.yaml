@@ -33,7 +33,8 @@ archives:
     files:
       - LICENSE
       - README.md
-      - sm-plugins/tedge-oscar-plugin
+      - sm-plugins/tedge-flows
+      - sm-plugins/tedge-flow-image
 
 release:
   mode: keep-existing
@@ -64,8 +65,12 @@ nfpms:
         dst: /usr/share/doc/tedge-oscar/LICENSE
       - src: ./README.md
         dst: /usr/share/doc/tedge-oscar/README.md
-      - src: ./sm-plugins/tedge-oscar-plugin
+      - src: ./sm-plugins/tedge-flows
         dst: /etc/tedge/sm-plugins/tedge-flows
+        file_info:
+          mode: 0755
+      - src: ./sm-plugins/tedge-flow-image
+        dst: /etc/tedge/sm-plugins/tedge-flow-image
         file_info:
           mode: 0755
   - id: rpm
@@ -82,8 +87,12 @@ nfpms:
         dst: /usr/share/doc/tedge-oscar/LICENSE
       - src: ./README.md
         dst: /usr/share/doc/tedge-oscar/README.md
-      - src: ./sm-plugins/tedge-oscar-plugin
+      - src: ./sm-plugins/tedge-flows
         dst: /etc/tedge/sm-plugins/tedge-flows
+        file_info:
+          mode: 0755
+      - src: ./sm-plugins/tedge-flow-image
+        dst: /etc/tedge/sm-plugins/tedge-flow-image
         file_info:
           mode: 0755
   - id: apk
@@ -100,7 +109,11 @@ nfpms:
         dst: /usr/share/doc/tedge-oscar/LICENSE
       - src: ./README.md
         dst: /usr/share/doc/tedge-oscar/README.md
-      - src: ./sm-plugins/tedge-oscar-plugin
+      - src: ./sm-plugins/tedge-flows
         dst: /etc/tedge/sm-plugins/tedge-flows
+        file_info:
+          mode: 0755
+      - src: ./sm-plugins/tedge-flow-image
+        dst: /etc/tedge/sm-plugins/tedge-flow-image
         file_info:
           mode: 0755
