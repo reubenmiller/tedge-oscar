@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/reubenmiller/tedge-oscar/compare/v0.1.1...v0.2.0) (2025-08-02)
+
+
+### Features
+
+* make topics optional when deploying an instance ([#18](https://github.com/reubenmiller/tedge-oscar/issues/18)) ([d6f8f13](https://github.com/reubenmiller/tedge-oscar/commit/d6f8f1318622599b01151b7753e432d5a8ae7522))
+
 ## [0.1.1](https://github.com/reubenmiller/tedge-oscar/compare/v0.1.0...v0.1.1) (2025-08-02)
 
 
