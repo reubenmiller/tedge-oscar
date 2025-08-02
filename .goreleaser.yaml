@@ -33,6 +33,7 @@ archives:
     files:
       - LICENSE
       - README.md
+      - sm-plugins/tedge-oscar-plugin
 checksum:
   name_template: "checksums.txt"
 snapshot:
@@ -59,6 +60,10 @@ nfpms:
         dst: /usr/share/doc/tedge-oscar/LICENSE
       - src: ./README.md
         dst: /usr/share/doc/tedge-oscar/README.md
+      - src: ./sm-plugins/tedge-oscar-plugin
+        dst: /etc/tedge/sm-plugins/tedge-flows
+        file_info:
+          mode: 0755
   - id: rpm
     ids: [tedge-oscar]
     priority: optional
@@ -73,6 +78,10 @@ nfpms:
         dst: /usr/share/doc/tedge-oscar/LICENSE
       - src: ./README.md
         dst: /usr/share/doc/tedge-oscar/README.md
+      - src: ./sm-plugins/tedge-oscar-plugin
+        dst: /etc/tedge/sm-plugins/tedge-flows
+        file_info:
+          mode: 0755
   - id: apk
     ids: [tedge-oscar]
     priority: optional
@@ -87,3 +96,7 @@ nfpms:
         dst: /usr/share/doc/tedge-oscar/LICENSE
       - src: ./README.md
         dst: /usr/share/doc/tedge-oscar/README.md
+      - src: ./sm-plugins/tedge-oscar-plugin
+        dst: /etc/tedge/sm-plugins/tedge-flows
+        file_info:
+          mode: 0755
