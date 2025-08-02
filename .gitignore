@@ -2,3 +2,4 @@
 /tedge-oscar
 .env
 dist/
+.DS_Store

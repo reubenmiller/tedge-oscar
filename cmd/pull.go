@@ -36,7 +36,7 @@ var pullCmd = &cobra.Command{
 			}
 			outputDir = filepath.Join(cfg.ImageDir, name)
 		}
-		if err := imagepull.PullImage(cfg, imageRef, outputDir); err != nil {
+		if err := imagepull.PullImage(cfg, imageRef, outputDir, "", false); err != nil {
 			return err
 		}
 		fmt.Fprintf(cmd.ErrOrStderr(), "Image %s pulled to %s\n", imageRef, outputDir)

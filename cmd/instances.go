@@ -282,7 +282,7 @@ $ tedge-oscar flows instances deploy myinstance ghcr.io/reubenmiller/connectivit
 
 		if _, err := os.Stat(imagePath); os.IsNotExist(err) {
 			fmt.Fprintf(cmd.ErrOrStderr(), "Image %s not found locally. Pulling...\n", imageRef)
-			if err := imagepull.PullImage(cfg, imageRef, cfg.ImageDir); err != nil {
+			if err := imagepull.PullImage(cfg, imageRef, cfg.ImageDir, "", false); err != nil {
 				return fmt.Errorf("failed to pull image: %w", err)
 			}
 		}
