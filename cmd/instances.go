@@ -45,6 +45,16 @@ $ tedge-oscar flows instances list`,
 		if err != nil {
 			return err
 		}
+		selectCols, err := cmd.Flags().GetString("select")
+		if err != nil {
+			return err
+		}
+		var colNames []string
+		if selectCols != "" {
+			colNames = strings.Split(selectCols, ",")
+		} else {
+			colNames = []string{"name", "path", "topics", "image", "imageVersion"}
+		}
 
 		cfgPath := configPath
 		if cfgPath == "" {
@@ -77,7 +87,6 @@ $ tedge-oscar flows instances list`,
 		}
 		// Prepare all rows first
 		rows := [][]string{}
-		colNames := []string{"name", "path", "topics", "image", "imageVersion"}
 		for _, file := range files {
 			if file.IsDir() || !strings.HasSuffix(file.Name(), ".toml") {
 				continue
@@ -129,7 +138,19 @@ $ tedge-oscar flows instances list`,
 					imageName = artifact.TrimVersion(imgDir)
 				}
 			}
-			rows = append(rows, []string{name, path, topics, imageName, imageVersion})
+			// Build row based on selected columns
+			rowMap := map[string]string{
+				"name":         name,
+				"path":         path,
+				"topics":       topics,
+				"image":        imageName,
+				"imageVersion": imageVersion,
+			}
+			row := make([]string, len(colNames))
+			for i, col := range colNames {
+				row[i] = rowMap[col]
+			}
+			rows = append(rows, row)
 		}
 		if len(rows) == 0 {
 			fmt.Fprintln(cmd.ErrOrStderr(), "No flow instances are currently deployed.")
@@ -144,6 +165,12 @@ $ tedge-oscar flows instances list`,
 				enc := json.NewEncoder(cmd.OutOrStdout())
 				enc.SetEscapeHTML(false)
 				_ = enc.Encode(obj)
+			}
+			return nil
+		}
+		if outputFormat == "tsv" {
+			for _, row := range rows {
+				fmt.Fprintln(cmd.OutOrStdout(), strings.Join(row, "\t"))
 			}
 			return nil
 		}
@@ -458,7 +485,8 @@ $ tedge-oscar flows instances remove myinstance`,
 			}
 		}
 		if matchFile == "" {
-			return fmt.Errorf("instance '%s' not found in %s", instanceName, deployDir)
+			fmt.Fprintf(cmd.ErrOrStderr(), "Instance %s does not exist, skipping removal.\n", instanceName)
+			return nil
 		}
 		if err := os.Remove(matchFile); err != nil {
 			return fmt.Errorf("failed to remove instance file: %w", err)
@@ -473,7 +501,8 @@ func init() {
 	if util.Isatty(os.Stdout.Fd()) {
 		defaultOutput = "table"
 	}
-	listInstancesCmd.Flags().StringP("output", "o", defaultOutput, "Output format: table|jsonl")
+	listInstancesCmd.Flags().StringP("output", "o", defaultOutput, "Output format: table|jsonl|tsv")
+	listInstancesCmd.Flags().String("select", "", "Comma separated list of columns to display (e.g. name,image,imageVersion)")
 	_ = listInstancesCmd.RegisterFlagCompletionFunc("output", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return []string{"table", "jsonl"}, cobra.ShellCompDirectiveNoFileComp
 	})
