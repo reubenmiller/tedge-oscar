@@ -73,3 +73,17 @@ nfpms:
         dst: /usr/share/doc/tedge-oscar/LICENSE
       - src: ./README.md
         dst: /usr/share/doc/tedge-oscar/README.md
+  - id: apk
+    ids: [tedge-oscar]
+    priority: optional
+    maintainer: "tedge-oscar maintainers <tedge-oscar@thin-edge.io>"
+    description: "CLI for managing thin-edge.io flows and OCI images."
+    vendor: "thin-edge.io"
+    homepage: "https://github.com/reubenmiller/tedge-oscar"
+    license: "Apache-2.0"
+    bindir: /usr/bin
+    contents:
+      - src: ./LICENSE
+        dst: /usr/share/doc/tedge-oscar/LICENSE
+      - src: ./README.md
+        dst: /usr/share/doc/tedge-oscar/README.md
