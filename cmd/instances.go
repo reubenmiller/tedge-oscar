@@ -279,9 +279,6 @@ $ tedge-oscar flows instances deploy myinstance ghcr.io/reubenmiller/connectivit
 		if err != nil {
 			return err
 		}
-		if len(topics) == 0 {
-			return fmt.Errorf("at least one --topics value must be provided")
-		}
 		tick := 0
 		if cmd.Flags().Changed("tick") {
 			tick, _ = cmd.Flags().GetInt("tick")
@@ -336,8 +333,10 @@ $ tedge-oscar flows instances deploy myinstance ghcr.io/reubenmiller/connectivit
 				return fmt.Errorf("failed to parse %s: %w", imageFlowDefinitionPath, err)
 			}
 			// Always update topics from CLI using a helper to set nested keys
-			if err := maputil.SetNestedMapValue(m, []string{"input", "mqtt", "topics"}, topics); err != nil {
-				return fmt.Errorf("failed to set input.mqtt.topics: %w", err)
+			if len(topics) > 0 {
+				if err := maputil.SetNestedMapValue(m, []string{"input", "mqtt", "topics"}, topics); err != nil {
+					return fmt.Errorf("failed to set input.mqtt.topics: %w", err)
+				}
 			}
 			// If tick is set, update all steps with tick value
 			if stepsRaw, ok := m["steps"]; ok {
@@ -383,13 +382,17 @@ $ tedge-oscar flows instances deploy myinstance ghcr.io/reubenmiller/connectivit
 				tickPtr = &tick
 			}
 			data := map[string]interface{}{
-				"input_topics": topics,
 				"steps": []map[string]interface{}{
 					{
 						"script":             scriptPath,
 						"tick_every_seconds": tickPtr,
 					},
 				},
+			}
+			if len(topics) > 0 {
+				if err := maputil.SetNestedMapValue(data, []string{"input", "mqtt", "topics"}, topics); err != nil {
+					return fmt.Errorf("failed to set input.mqtt.topics: %w", err)
+				}
 			}
 			f, err := os.Create(tomlPath)
 			if err != nil {
@@ -511,8 +514,7 @@ func init() {
 	instancesCmd.AddCommand(removeInstanceCmd)
 
 	deployCmd.Flags().Int("tick", 0, "Tick interval in seconds (optional)")
-	deployCmd.Flags().StringArray("topics", nil, "Input topics (repeatable, required)")
-	deployCmd.MarkFlagRequired("topics")
+	deployCmd.Flags().StringArray("topics", nil, "Input topics (repeatable, optional)")
 	_ = deployCmd.RegisterFlagCompletionFunc("topics", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		// Common thin-edge.io MQTT topics
 		commonTopics := []string{
