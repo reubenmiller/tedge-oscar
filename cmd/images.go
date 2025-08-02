@@ -165,4 +165,5 @@ func init() {
 		return []string{"table", "jsonl"}, cobra.ShellCompDirectiveNoFileComp
 	})
 	imagesCmd.AddCommand(listImagesCmd)
+	imagesCmd.AddCommand(saveCmd)
 }
