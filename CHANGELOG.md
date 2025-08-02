@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/reubenmiller/tedge-oscar/compare/v0.2.0...v0.3.0) (2025-08-02)
+
+
+### Features
+
+* add flow images sm-plugin ([#20](https://github.com/reubenmiller/tedge-oscar/issues/20)) ([5502754](https://github.com/reubenmiller/tedge-oscar/commit/5502754d1190024408e2d0590502ea07a37941c6))
+
 ## [0.2.0](https://github.com/reubenmiller/tedge-oscar/compare/v0.1.1...v0.2.0) (2025-08-02)
 
 
