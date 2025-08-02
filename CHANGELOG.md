@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.1](https://github.com/reubenmiller/tedge-oscar/compare/v0.1.0...v0.1.1) (2025-08-02)
+
+
+### Bug Fixes
+
+* fetch git tag ([13b125a](https://github.com/reubenmiller/tedge-oscar/commit/13b125a556295767cab7ac2a5b2f1305faf837fc))
+
 ## [0.1.0](https://github.com/reubenmiller/tedge-oscar/compare/v0.0.6...v0.1.0) (2025-08-02)
 
 
