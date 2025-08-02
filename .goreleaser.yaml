@@ -34,6 +34,10 @@ archives:
       - LICENSE
       - README.md
       - sm-plugins/tedge-oscar-plugin
+
+release:
+  mode: keep-existing
+
 checksum:
   name_template: "checksums.txt"
 snapshot:
