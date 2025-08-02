@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/cobra"
@@ -35,6 +36,17 @@ var listImagesCmd = &cobra.Command{
 	Aliases: []string{"ls"},
 	Example: `tedge-oscar flows images list`,
 	RunE: func(cmd *cobra.Command, args []string) error {
+		selectCols, err := cmd.Flags().GetString("select")
+		if err != nil {
+			return err
+		}
+		var colNames []string
+		if selectCols != "" {
+			colNames = strings.Split(selectCols, ",")
+		} else {
+			colNames = []string{"image", "version", "digest", "imageDir"}
+		}
+
 		cfgPath := configPath
 		if cfgPath == "" {
 			cfgPath = config.DefaultConfigPath()
@@ -89,13 +101,23 @@ var listImagesCmd = &cobra.Command{
 				}
 				f.Close()
 			}
-			rows = append(rows, []string{artifact.TrimVersion(entry.Name()), version, digest, imageDir})
+			rowMap := map[string]string{
+				"image":    artifact.TrimVersion(entry.Name()),
+				"version":  version,
+				"digest":   digest,
+				"imageDir": imageDir,
+			}
+			row := make([]string, len(colNames))
+			for i, col := range colNames {
+				row[i] = rowMap[col]
+			}
+			rows = append(rows, row)
 		}
 		if len(rows) == 0 {
 			fmt.Fprintf(cmd.ErrOrStderr(), "No images found in image_dir (%s).\n", unexpandedImageDir)
 			return nil
 		}
-		colNames := []string{"image", "version", "digest", "imageDir"}
+
 		if outputFormat == "jsonl" || outputFormat == "json" {
 			for _, row := range rows {
 				obj := map[string]string{}
@@ -107,6 +129,12 @@ var listImagesCmd = &cobra.Command{
 				if err := enc.Encode(obj); err != nil {
 					return err
 				}
+			}
+			return nil
+		}
+		if outputFormat == "tsv" {
+			for _, row := range rows {
+				fmt.Fprintln(cmd.OutOrStdout(), strings.Join(row, "\t"))
 			}
 			return nil
 		}
@@ -160,10 +188,12 @@ func init() {
 	if util.Isatty(os.Stdout.Fd()) {
 		defaultOutput = "table"
 	}
-	listImagesCmd.Flags().StringP("output", "o", defaultOutput, "Output format: table|jsonl")
+	listImagesCmd.Flags().StringP("output", "o", defaultOutput, "Output format: table|jsonl|tsv")
+	listImagesCmd.Flags().String("select", "", "Comma separated list of columns to display (e.g. image,version,digest)")
 	_ = listImagesCmd.RegisterFlagCompletionFunc("output", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return []string{"table", "jsonl"}, cobra.ShellCompDirectiveNoFileComp
+		return []string{"table", "jsonl", "tsv"}, cobra.ShellCompDirectiveNoFileComp
 	})
 	imagesCmd.AddCommand(listImagesCmd)
 	imagesCmd.AddCommand(saveCmd)
+	imagesCmd.AddCommand(removeImageCmd)
 }
