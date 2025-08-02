@@ -17,8 +17,8 @@ var (
 
 var saveCmd = &cobra.Command{
 	Use:   "save",
-	Short: "Save an OCI image as a tarball",
-	Long:  `Save an OCI image from a registry to a local tarball (optionally compressed).`,
+	Short: "Save a flow image as a tarball",
+	Long:  `Save a flow image from a registry to a local tarball (optionally compressed).`,
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cfgPath := configPath
@@ -50,5 +50,4 @@ func init() {
 	// imageRef is now positional
 	saveCmd.Flags().StringVarP(&saveTarballPath, "output", "o", "", "Path to output tarball (e.g. image.tar or image.tar.gz)")
 	saveCmd.Flags().BoolVar(&saveCompress, "compress", false, "Compress tarball using gzip")
-	// Add to root or imagesCmd as appropriate
 }

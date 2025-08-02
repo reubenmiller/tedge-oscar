@@ -10,7 +10,7 @@ import (
 
 var loadCmd = &cobra.Command{
 	Use:   "load [source]",
-	Short: "Load an OCI image from a tarball (local file or URL)",
+	Short: "Load a flow image from a tarball (local file or URL)",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		source := args[0]

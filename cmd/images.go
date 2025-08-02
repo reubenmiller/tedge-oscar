@@ -31,7 +31,7 @@ $ tedge-oscar flows images push ghcr.io/reubenmiller/connectivity-counter:1.0
 
 var listImagesCmd = &cobra.Command{
 	Use:     "list",
-	Short:   "List pulled images in the image_dir",
+	Short:   "List flow images in the image_dir",
 	Aliases: []string{"ls"},
 	Example: `tedge-oscar flows images list`,
 	RunE: func(cmd *cobra.Command, args []string) error {

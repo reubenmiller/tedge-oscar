@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-// LoadTarballImage loads an OCI image from a tarball, either from a URL or a local file path, and extracts it to outputDir.
+// LoadTarballImage loads a flow image from a tarball, either from a URL or a local file path, and extracts it to outputDir.
 func LoadTarballImage(source string, outputDir string) error {
 	var reader io.ReadCloser
 	var err error
