@@ -3,7 +3,10 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
+	"github.com/reubenmiller/tedge-oscar/internal/artifact"
+	"github.com/reubenmiller/tedge-oscar/internal/config"
 	"github.com/reubenmiller/tedge-oscar/internal/imagepull"
 	"github.com/spf13/cobra"
 )
@@ -16,7 +19,19 @@ var loadCmd = &cobra.Command{
 		source := args[0]
 		outputDir, _ := cmd.Flags().GetString("output-dir")
 		if outputDir == "" {
-			outputDir = "./image"
+			cfgPath := configPath
+			if cfgPath == "" {
+				cfgPath = config.DefaultConfigPath()
+			}
+			cfg, err := config.LoadConfig(cfgPath)
+			if err != nil {
+				return fmt.Errorf("failed to load config: %w", err)
+			}
+			name, err := artifact.ParseName(source, false)
+			if err != nil {
+				return err
+			}
+			outputDir = filepath.Join(cfg.ImageDir, name)
 		}
 		if err := os.MkdirAll(outputDir, 0755); err != nil {
 			return fmt.Errorf("failed to create output dir: %w", err)
@@ -31,6 +46,6 @@ var loadCmd = &cobra.Command{
 }
 
 func init() {
-	loadCmd.Flags().String("output-dir", "./image", "Directory to extract the image contents to")
+	loadCmd.Flags().String("output-dir", "", "Directory to download the artifact contents to (default: config image_dir)")
 	imagesCmd.AddCommand(loadCmd)
 }
