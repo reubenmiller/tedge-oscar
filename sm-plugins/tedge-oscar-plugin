@@ -79,16 +79,12 @@ case "$COMMAND" in
             log "Installing from file: $FILE"
             tedge-oscar flows images load "$FILE" || exit "$EXIT_FAILURE"
         else
-            MODULE="$MODULE_NAME"
-            if [ -n "$MODULE_VERSION" ] && [ "$MODULE_VERSION" != "latest" ]; then
-                MODULE="${MODULE_NAME}:${MODULE_VERSION}"
-            fi
-
-            log "Installing: $MODULE"
-            tedge-oscar flows images pull "$MODULE" || exit "$EXIT_FAILURE"
+            log "Pulling flow image: $MODULE_VERSION"
+            tedge-oscar flows images pull "$MODULE_VERSION" || exit "$EXIT_FAILURE"
         fi
 
-        tedge-oscar flows instances deploy "$MODULE_NAME" --image "$MODULE_VERSION" || exit "$EXIT_FAILURE"
+        log "Deploying instance. name=$MODULE_NAME, image=$MODULE_VERSION"
+        tedge-oscar flows instances deploy "$MODULE_NAME" "$MODULE_VERSION" || exit "$EXIT_FAILURE"
         ;;
     remove)
         # Removing
