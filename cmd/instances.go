@@ -279,9 +279,9 @@ $ tedge-oscar flows instances deploy myinstance ghcr.io/reubenmiller/connectivit
 		if err != nil {
 			return err
 		}
-		tick := 0
-		if cmd.Flags().Changed("tick") {
-			tick, _ = cmd.Flags().GetInt("tick")
+		interval := ""
+		if cmd.Flags().Changed("interval") {
+			interval, _ = cmd.Flags().GetString("interval")
 		}
 		deployDir := cfg.DeployDir
 		if deployDir == "" {
@@ -338,7 +338,7 @@ $ tedge-oscar flows instances deploy myinstance ghcr.io/reubenmiller/connectivit
 					return fmt.Errorf("failed to set input.mqtt.topics: %w", err)
 				}
 			}
-			// If tick is set, update all steps with tick value
+			// If interval is set, update all steps with the interval value
 			if stepsRaw, ok := m["steps"]; ok {
 				var newSteps []map[string]interface{}
 				switch steps := stepsRaw.(type) {
@@ -346,8 +346,8 @@ $ tedge-oscar flows instances deploy myinstance ghcr.io/reubenmiller/connectivit
 					newSteps = make([]map[string]interface{}, len(steps))
 					for i, stepMap := range steps {
 						stepMap["script"] = scriptPath
-						if tick > 0 {
-							stepMap["tick_every_seconds"] = tick
+						if interval != "" {
+							stepMap["interval"] = interval
 						}
 						newSteps[i] = stepMap
 					}
@@ -356,8 +356,8 @@ $ tedge-oscar flows instances deploy myinstance ghcr.io/reubenmiller/connectivit
 					for i, s := range steps {
 						if stageMap, ok := s.(map[string]interface{}); ok {
 							stageMap["script"] = scriptPath
-							if tick > 0 {
-								stageMap["tick_every_seconds"] = tick
+							if interval != "" {
+								stageMap["interval"] = interval
 							}
 							newSteps[i] = stageMap
 						}
@@ -377,15 +377,15 @@ $ tedge-oscar flows instances deploy myinstance ghcr.io/reubenmiller/connectivit
 			return nil
 		} else {
 			// Fallback: create minimal config
-			var tickPtr *int
-			if tick > 0 {
-				tickPtr = &tick
+			var intervalPtr *string
+			if interval != "" {
+				intervalPtr = &interval
 			}
 			data := map[string]interface{}{
 				"steps": []map[string]interface{}{
 					{
-						"script":             scriptPath,
-						"tick_every_seconds": tickPtr,
+						"script":   scriptPath,
+						"interval": intervalPtr,
 					},
 				},
 			}
@@ -513,7 +513,7 @@ func init() {
 	instancesCmd.AddCommand(deployCmd)
 	instancesCmd.AddCommand(removeInstanceCmd)
 
-	deployCmd.Flags().Int("tick", 0, "Tick interval in seconds (optional)")
+	deployCmd.Flags().String("interval", "", "Interval in seconds (optional)")
 	deployCmd.Flags().StringArray("topics", nil, "Input topics (repeatable, optional)")
 	_ = deployCmd.RegisterFlagCompletionFunc("topics", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		// Common thin-edge.io MQTT topics
