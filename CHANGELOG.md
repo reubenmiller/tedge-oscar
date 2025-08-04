@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/reubenmiller/tedge-oscar/compare/v0.3.0...v0.4.0) (2025-08-04)
+
+
+### Miscellaneous Chores
+
+* release 0.4.0 ([27b8ee2](https://github.com/reubenmiller/tedge-oscar/commit/27b8ee2e7ecf54743c275a2cbb9757992c06ce57))
+
 ## [0.3.0](https://github.com/reubenmiller/tedge-oscar/compare/v0.2.0...v0.3.0) (2025-08-02)
 
 
