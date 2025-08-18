@@ -53,6 +53,8 @@ changelog:
 nfpms:
   - id: deb
     ids: [tedge-oscar]
+    formats:
+      - deb
     priority: optional
     maintainer: "tedge-oscar maintainers <tedge-oscar@thin-edge.io>"
     description: "CLI for managing thin-edge.io flows and OCI images."
@@ -73,8 +75,14 @@ nfpms:
         dst: /etc/tedge/sm-plugins/tedge-flow-image
         file_info:
           mode: 0755
+      - src: internal/config/tedge-oscar-linux.toml
+        dst: /etc/tedge/plugins/tedge-oscar.toml
+        file_info:
+          mode: 0644
   - id: rpm
     ids: [tedge-oscar]
+    formats:
+      - rpm
     priority: optional
     maintainer: "tedge-oscar maintainers <tedge-oscar@thin-edge.io>"
     description: "CLI for managing thin-edge.io flows and OCI images."
@@ -95,8 +103,14 @@ nfpms:
         dst: /etc/tedge/sm-plugins/tedge-flow-image
         file_info:
           mode: 0755
+      - src: internal/config/tedge-oscar-linux.toml
+        dst: /etc/tedge/plugins/tedge-oscar.toml
+        file_info:
+          mode: 0644
   - id: apk
     ids: [tedge-oscar]
+    formats:
+      - apk
     priority: optional
     maintainer: "tedge-oscar maintainers <tedge-oscar@thin-edge.io>"
     description: "CLI for managing thin-edge.io flows and OCI images."
@@ -117,3 +131,7 @@ nfpms:
         dst: /etc/tedge/sm-plugins/tedge-flow-image
         file_info:
           mode: 0755
+      - src: internal/config/tedge-oscar-linux.toml
+        dst: /etc/tedge/plugins/tedge-oscar.toml
+        file_info:
+          mode: 0644
