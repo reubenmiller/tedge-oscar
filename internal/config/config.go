@@ -32,6 +32,11 @@ func DefaultConfigPath() string {
 	if envPath := os.Getenv("TEDGE_OSCAR_CONFIG"); envPath != "" {
 		return os.ExpandEnv(envPath)
 	}
+
+	if _, err := os.Stat("/etc/tedge/plugins/tedge-oscar.toml"); err == nil {
+		return "/etc/tedge/plugins/tedge-oscar.toml"
+	}
+
 	home, err := os.UserHomeDir()
 	if err != nil {
 		return "./tedge-oscar.toml"

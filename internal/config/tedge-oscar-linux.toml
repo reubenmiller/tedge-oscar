@@ -1,0 +1,10 @@
+# Directory where pulled OCI images will be stored
+image_dir = "/usr/share/tedge/flows"
+
+# Directory where deployment instance TOML files will be written
+deploy_dir = "$TEDGE_CONFIG_DIR/flows"
+
+[[registries]]
+registry = "ghcr.io"
+username = ""
+password = ""
