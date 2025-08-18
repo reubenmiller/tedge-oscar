@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.0](https://github.com/thin-edge/tedge-oscar/compare/v0.5.0...v0.6.0) (2025-08-18)
+
+
+### Features
+
+* add linux configuration that is compatible with tedge-flows ([#26](https://github.com/thin-edge/tedge-oscar/issues/26)) ([3300dc4](https://github.com/thin-edge/tedge-oscar/commit/3300dc45421fbdd2eca1248162114b68e274072c))
+
 ## [0.5.0](https://github.com/thin-edge/tedge-oscar/compare/v0.4.0...v0.5.0) (2025-08-18)
 
 
