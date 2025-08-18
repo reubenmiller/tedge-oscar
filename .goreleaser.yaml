@@ -79,6 +79,14 @@ nfpms:
         dst: /etc/tedge/plugins/tedge-oscar.toml
         file_info:
           mode: 0644
+      - src: packaging/completions/_zsh
+        dst: /usr/share/zsh/vendor-completions/_tedge-oscar
+        file_info:
+          mode: 0644
+      - src: packaging/completions/_bash
+        dst: /usr/share/bash-completion/completions/tedge-oscar
+        file_info:
+          mode: 0644
   - id: rpm
     ids: [tedge-oscar]
     formats:
@@ -107,6 +115,14 @@ nfpms:
         dst: /etc/tedge/plugins/tedge-oscar.toml
         file_info:
           mode: 0644
+      - src: packaging/completions/_zsh
+        dst: /usr/share/zsh/vendor-completions/_tedge-oscar
+        file_info:
+          mode: 0644
+      - src: packaging/completions/_bash
+        dst: /usr/share/bash-completion/completions/tedge-oscar
+        file_info:
+          mode: 0644
   - id: apk
     ids: [tedge-oscar]
     formats:
@@ -133,5 +149,13 @@ nfpms:
           mode: 0755
       - src: internal/config/tedge-oscar-linux.toml
         dst: /etc/tedge/plugins/tedge-oscar.toml
+        file_info:
+          mode: 0644
+      - src: packaging/completions/_zsh
+        dst: /usr/share/zsh/vendor-completions/_tedge-oscar
+        file_info:
+          mode: 0644
+      - src: packaging/completions/_bash
+        dst: /usr/share/bash-completion/completions/tedge-oscar
         file_info:
           mode: 0644
