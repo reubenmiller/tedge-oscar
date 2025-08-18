@@ -47,3 +47,11 @@ jobs:
         run: goreleaser release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_PLEASE_TOKEN }}
+
+      - name: Publish to Linux Repository
+        env:
+          PUBLISH_TOKEN: ${{ secrets.PUBLISH_TOKEN }}
+          PUBLISH_REPO: ${{ secrets.PUBLISH_REPO }}
+          PUBLISH_OWNER: ${{ secrets.PUBLISH_OWNER }}
+        run: |
+          ./ci/publish.sh ./dist --repo "$PUBLISH_REPO" --owner "$PUBLISH_OWNER"
