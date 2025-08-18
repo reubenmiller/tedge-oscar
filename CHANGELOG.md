@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.0](https://github.com/thin-edge/tedge-oscar/compare/v0.4.0...v0.5.0) (2025-08-18)
+
+
+### Features
+
+* publish linux packages to cloudsmith ([#24](https://github.com/thin-edge/tedge-oscar/issues/24)) ([4b067ca](https://github.com/thin-edge/tedge-oscar/commit/4b067caf0c371dfce47485668829dd4095c79b86))
+
 ## [0.4.0](https://github.com/reubenmiller/tedge-oscar/compare/v0.3.0...v0.4.0) (2025-08-04)
 
 
