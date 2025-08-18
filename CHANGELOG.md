@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.0](https://github.com/thin-edge/tedge-oscar/compare/v0.6.0...v0.7.0) (2025-08-18)
+
+
+### Features
+
+* add linux package completions ([#28](https://github.com/thin-edge/tedge-oscar/issues/28)) ([8094417](https://github.com/thin-edge/tedge-oscar/commit/80944177333fb46238c22293a4a2cde8f8d1fc8a))
+
 ## [0.6.0](https://github.com/thin-edge/tedge-oscar/compare/v0.5.0...v0.6.0) (2025-08-18)
 
 
