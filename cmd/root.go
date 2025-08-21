@@ -16,10 +16,10 @@ var rootCmd = &cobra.Command{
 $ tedge-oscar images list
 
 # Pull an image from a registry
-$ tedge-oscar images pull ghcr.io/reubenmiller/connectivity-counter:1.0
+$ tedge-oscar images pull ghcr.io/thin-edge/connectivity-counter:1.0
 
 # Deploy a flow instance
-$ tedge-oscar instances deploy myinstance ghcr.io/reubenmiller/connectivity-counter:1.0 --topics te/device/main///m/+
+$ tedge-oscar instances deploy myinstance ghcr.io/thin-edge/connectivity-counter:1.0 --topics te/device/main///m/+
 `,
 }
 

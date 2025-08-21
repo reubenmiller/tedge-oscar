@@ -15,8 +15,8 @@ import (
 	"oras.land/oras-go/v2/content/file"
 	"oras.land/oras-go/v2/registry/remote"
 
-	"github.com/reubenmiller/tedge-oscar/internal/config"
-	"github.com/reubenmiller/tedge-oscar/internal/registryauth"
+	"github.com/thin-edge/tedge-oscar/internal/config"
+	"github.com/thin-edge/tedge-oscar/internal/registryauth"
 )
 
 // PullImage pulls an OCI artifact and stores its contents in outputDir.

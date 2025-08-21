@@ -5,10 +5,10 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/reubenmiller/tedge-oscar/internal/artifact"
-	"github.com/reubenmiller/tedge-oscar/internal/config"
-	"github.com/reubenmiller/tedge-oscar/internal/imagepull"
 	"github.com/spf13/cobra"
+	"github.com/thin-edge/tedge-oscar/internal/artifact"
+	"github.com/thin-edge/tedge-oscar/internal/config"
+	"github.com/thin-edge/tedge-oscar/internal/imagepull"
 )
 
 var loadCmd = &cobra.Command{

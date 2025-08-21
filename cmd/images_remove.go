@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/reubenmiller/tedge-oscar/internal/config"
 	"github.com/spf13/cobra"
+	"github.com/thin-edge/tedge-oscar/internal/config"
 )
 
 var removeImageCmd = &cobra.Command{

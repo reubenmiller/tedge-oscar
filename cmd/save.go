@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/reubenmiller/tedge-oscar/internal/config"
-	"github.com/reubenmiller/tedge-oscar/internal/imagepull"
 	"github.com/spf13/cobra"
+	"github.com/thin-edge/tedge-oscar/internal/config"
+	"github.com/thin-edge/tedge-oscar/internal/imagepull"
 )
 
 var (

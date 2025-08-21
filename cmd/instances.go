@@ -9,13 +9,13 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/olekukonko/tablewriter"
-	"github.com/reubenmiller/tedge-oscar/internal/artifact"
-	"github.com/reubenmiller/tedge-oscar/internal/config"
-	"github.com/reubenmiller/tedge-oscar/internal/imagepull"
-	"github.com/reubenmiller/tedge-oscar/internal/util"
-	"github.com/reubenmiller/tedge-oscar/pkg/maputil"
-	"github.com/reubenmiller/tedge-oscar/pkg/types/flows"
 	"github.com/spf13/cobra"
+	"github.com/thin-edge/tedge-oscar/internal/artifact"
+	"github.com/thin-edge/tedge-oscar/internal/config"
+	"github.com/thin-edge/tedge-oscar/internal/imagepull"
+	"github.com/thin-edge/tedge-oscar/internal/util"
+	"github.com/thin-edge/tedge-oscar/pkg/maputil"
+	"github.com/thin-edge/tedge-oscar/pkg/types/flows"
 	"golang.org/x/term"
 )
 
@@ -26,7 +26,7 @@ var instancesCmd = &cobra.Command{
 $ tedge-oscar flows instances list
 
 # Deploy a new instance
-$ tedge-oscar flows instances deploy myinstance ghcr.io/reubenmiller/connectivity-counter:1.0 --topics te/device/main///m/+
+$ tedge-oscar flows instances deploy myinstance ghcr.io/thin-edge/connectivity-counter:1.0 --topics te/device/main///m/+
 
 # Remove an instance
 $ tedge-oscar flows instances remove myinstance
@@ -227,7 +227,7 @@ var deployCmd = &cobra.Command{
 	Short:   "Deploy a flow instance",
 	Aliases: []string{"run"},
 	Example: `# Deploy a new instance using a specific image and topic
-$ tedge-oscar flows instances deploy myinstance ghcr.io/reubenmiller/connectivity-counter:1.0 --topics te/device/main///m/+`,
+$ tedge-oscar flows instances deploy myinstance ghcr.io/thin-edge/connectivity-counter:1.0 --topics te/device/main///m/+`,
 	Args:         cobra.ExactArgs(2),
 	SilenceUsage: true, // Do not show help on runtime errors
 	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {

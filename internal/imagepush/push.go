@@ -14,8 +14,8 @@ import (
 	"oras.land/oras-go/v2/content/memory"
 	"oras.land/oras-go/v2/registry/remote"
 
-	"github.com/reubenmiller/tedge-oscar/internal/config"
-	"github.com/reubenmiller/tedge-oscar/internal/registryauth"
+	"github.com/thin-edge/tedge-oscar/internal/config"
+	"github.com/thin-edge/tedge-oscar/internal/registryauth"
 )
 
 // PushImage pushes files as an OCI artifact, preserving their paths relative to rootDir.

@@ -10,9 +10,9 @@ import (
 	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/cobra"
 
-	"github.com/reubenmiller/tedge-oscar/internal/artifact"
-	"github.com/reubenmiller/tedge-oscar/internal/config"
-	"github.com/reubenmiller/tedge-oscar/internal/util"
+	"github.com/thin-edge/tedge-oscar/internal/artifact"
+	"github.com/thin-edge/tedge-oscar/internal/config"
+	"github.com/thin-edge/tedge-oscar/internal/util"
 )
 
 var imagesCmd = &cobra.Command{
@@ -23,10 +23,10 @@ var imagesCmd = &cobra.Command{
 $ tedge-oscar flows images list
 
 # Pull an image from a registry
-$ tedge-oscar flows images pull ghcr.io/reubenmiller/connectivity-counter:1.0
+$ tedge-oscar flows images pull ghcr.io/thin-edge/connectivity-counter:1.0
 
 # Push an image to a registry
-$ tedge-oscar flows images push ghcr.io/reubenmiller/connectivity-counter:1.0
+$ tedge-oscar flows images push ghcr.io/thin-edge/connectivity-counter:1.0
 `,
 }
 
