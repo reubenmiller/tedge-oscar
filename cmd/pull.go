@@ -4,17 +4,17 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/reubenmiller/tedge-oscar/internal/artifact"
-	"github.com/reubenmiller/tedge-oscar/internal/config"
-	"github.com/reubenmiller/tedge-oscar/internal/imagepull"
-	"github.com/reubenmiller/tedge-oscar/internal/registryauth"
 	"github.com/spf13/cobra"
+	"github.com/thin-edge/tedge-oscar/internal/artifact"
+	"github.com/thin-edge/tedge-oscar/internal/config"
+	"github.com/thin-edge/tedge-oscar/internal/imagepull"
+	"github.com/thin-edge/tedge-oscar/internal/registryauth"
 )
 
 var pullCmd = &cobra.Command{
 	Use:     "pull [image]",
 	Short:   "Pull a flow image from an OCI registry",
-	Example: `tedge-oscar flows images pull ghcr.io/reubenmiller/connectivity-counter:1.0`,
+	Example: `tedge-oscar flows images pull ghcr.io/thin-edge/connectivity-counter:1.0`,
 	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		// Enable debug HTTP if logLevel is debug

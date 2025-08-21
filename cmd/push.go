@@ -3,16 +3,16 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/reubenmiller/tedge-oscar/internal/config"
-	"github.com/reubenmiller/tedge-oscar/internal/imagepush"
-	"github.com/reubenmiller/tedge-oscar/internal/registryauth"
 	"github.com/spf13/cobra"
+	"github.com/thin-edge/tedge-oscar/internal/config"
+	"github.com/thin-edge/tedge-oscar/internal/imagepush"
+	"github.com/thin-edge/tedge-oscar/internal/registryauth"
 )
 
 var pushCmd = &cobra.Command{
 	Use:     "push [image]",
 	Short:   "Push a flow image to an OCI registry",
-	Example: `tedge-oscar flows images push ghcr.io/reubenmiller/connectivity-counter:1.0 --file flow.json --file README.md`,
+	Example: `tedge-oscar flows images push ghcr.io/thin-edge/connectivity-counter:1.0 --file flow.json --file README.md`,
 	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		// Set debugHTTP based on logLevel

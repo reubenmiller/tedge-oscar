@@ -9,7 +9,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/reubenmiller/tedge-oscar/internal/config"
+	"github.com/thin-edge/tedge-oscar/internal/config"
 )
 
 var debugHTTP bool

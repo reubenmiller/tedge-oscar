@@ -1,4 +1,4 @@
-module github.com/reubenmiller/tedge-oscar
+module github.com/thin-edge/tedge-oscar
 
 go 1.23.0
 
