@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.0](https://github.com/thin-edge/tedge-oscar/compare/v0.7.0...v0.8.0) (2025-08-21)
+
+
+### Features
+
+* rename package owner to thin-edge ([#30](https://github.com/thin-edge/tedge-oscar/issues/30)) ([d370faf](https://github.com/thin-edge/tedge-oscar/commit/d370faf443285363bbc5853b9560f4575d4cdf2e))
+
 ## [0.7.0](https://github.com/thin-edge/tedge-oscar/compare/v0.6.0...v0.7.0) (2025-08-18)
 
 
